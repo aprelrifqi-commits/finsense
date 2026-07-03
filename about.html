@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FinSense SVM · Analisis Sentimen</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #f5f2ec;
+    --card: #fffdf9;
+    --text: #2a2a26;
+    --text-muted: #7a7a72;
+    --border: #e0d9cf;
+    --accent: #2d5a4a;
+    --accent-light: #e8f0ec;
+    --gold: #c9a03d;
+    --gold-light: #f5efdf;
+    --success: #2d6a4f;
+    --danger: #b8734a;
+    --neutral: #9e9580;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* NAVBAR */
+.navbar-custom {
+    background: var(--accent);
+    padding: 0.8rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-custom .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.nav-brand .logo {
+    width: 38px;
+    height: 38px;
+    background: var(--gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.nav-brand h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+.nav-brand h2 span {
+    color: var(--gold);
+}
+
+.nav-links {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.nav-links a {
+    color: rgba(255,255,245,0.9);
+    text-decoration: none;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.nav-links a:hover {
+    background: rgba(255,255,245,0.15);
+    color: white;
+}
+
+.nav-links a.active {
+    background: rgba(255,255,245,0.2);
+    color: white;
+}
+
+/* MAIN */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gold);
+    color: #2a2a26;
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    transition: 0.2s;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.back-btn:hover {
+    background: #b88a2e;
+    color: white;
+    transform: translateX(-4px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+/* HEADER SECTION */
+.header-section {
+    background: linear-gradient(135deg, var(--accent) 0%, #1e4a3a 100%);
+    padding: 1.5rem;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+}
+
+.header-section h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.3rem;
+}
+
+.header-section p {
+    font-size: 0.75rem;
+    color: rgba(255,255,245,0.8);
+}
+
+/* CARD */
+.card-custom {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+}
+
+.card-title i {
+    margin-right: 0.5rem;
+    color: var(--gold);
+}
+
+/* FORM */
+textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 0.8rem;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201, 160, 61, 0.1);
+}
+
+/* BUTTON */
+.btn-primary-custom {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    padding: 0.6rem;
+    font-weight: 600;
+    width: 100%;
+    transition: 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background: #1e4a3a;
+    transform: translateY(-1px);
+}
+
+.btn-outline-custom {
+    background: var(--gold-light);
+    color: var(--accent);
+    border: 1px solid var(--gold);
+    border-radius: 40px;
+    padding: 0.5rem;
+    font-weight: 500;
+    width: 100%;
+    transition: 0.2s;
+}
+
+.btn-outline-custom:hover {
+    background: var(--gold);
+    color: white;
+}
+
+/* RESULT */
+.result-box {
+    background: var(--accent-light);
+    padding: 1rem;
+    border-radius: 14px;
+    margin-top: 1rem;
+}
+
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.result-badge.positif { background: var(--success); color: white; }
+.result-badge.negatif { background: var(--danger); color: white; }
+.result-badge.netral { background: var(--neutral); color: white; }
+
+/* STATS CARD */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 14px;
+    background: var(--accent-light);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* TABLE */
+.table-custom {
+    width: 100%;
+    font-size: 0.7rem;
+    border-collapse: collapse;
+}
+
+.table-custom thead {
+    background: var(--accent);
+    color: white;
+}
+
+.table-custom th {
+    padding: 0.5rem;
+    font-weight: 500;
+}
+
+.table-custom td {
+    padding: 0.4rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+/* LOADING OVERLAY */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+.loading-box {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 24px;
+    text-align: center;
+    min-width: 280px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--accent-light);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* FILE UPLOAD */
+.file-zone {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 0.8rem;
+}
+
+.file-zone:hover {
+    border-color: var(--gold);
+    background: var(--gold-light);
+}
+
+.file-zone i {
+    font-size: 1.5rem;
+    color: var(--gold);
+}
+
+/* FOOTER */
+.footer {
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    padding: 0.8rem;
+    text-align: center;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 1rem;
+}
+
+.footer span {
+    font-weight: 500;
+    color: var(--accent);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .main-content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar-custom">
+    <div class="container">
+        <div class="nav-brand">
+            <div class="logo"><i class="bi bi-calculator-fill"></i></div>
+            <h2>Fin<span>Sense</span> SVM</h2>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- TOMBOL KEMBALI -->
+    <a href="/" class="back-btn"><i class="bi bi-arrow-left"></i> ← Kembali ke Beranda</a>
+
+    <!-- HEADER -->
+    <div class="header-section">
+        <h3><i class="bi bi-robot"></i> Analisis Sentimen SVM</h3>
+        <p>Input teks / Upload file CSV → Preprocessing → Klasifikasi Otomatis</p>
+    </div>
+
+    <div class="row g-3">
+        <!-- KOLOM KIRI: INPUT MANUAL -->
+        <div class="col-lg-6">
+            <div class="card-custom">
+                <div class="card-title"><i class="bi bi-pencil-square"></i> Input Komentar Manual</div>
+                <textarea id="text" rows="4" placeholder="Tulis komentar atau tweet di sini..."></textarea>
+                <button class="btn-primary-custom mt-3" onclick="predictSentimen()">
+                    <i class="bi bi-magic"></i> Analisis Sentimen
+                </button>
+                <div id="result" class="result-box">
+                    <span class="text-muted">Hasil akan muncul di sini...</span>
+                </div>
+                <small id="clean" class="text-muted" style="font-size: 0.65rem;"></small>
+            </div>
+        </div>
+
+        <!-- KOLOM KANAN: UPLOAD FILE -->
+        <div class="col-lg-6">
+            <div class="card-custom">
+                <div class="card-title"><i class="bi bi-upload"></i> Upload File (Batch Processing)</div>
+                <div class="file-zone" onclick="document.getElementById('fileInput').click()">
+                    <i class="bi bi-cloud-upload"></i>
+                    <p style="margin-top: 0.5rem; font-size: 0.7rem;">Klik untuk upload file CSV</p>
+                    <small class="text-muted">Format: kolom 'text' atau 'tweet' atau 'komentar'</small>
+                </div>
+                <input type="file" id="fileInput" accept=".csv" style="display: none;" onchange="processFile(this)">
+                <button class="btn-outline-custom" onclick="document.getElementById('fileInput').click()">
+                    <i class="bi bi-folder2-open"></i> Pilih File CSV
+                </button>
+                <div id="fileInfo" class="text-muted mt-2" style="font-size: 0.65rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATISTIK HASIL BATCH -->
+    <div class="card-custom" id="statsCard" style="display: none;">
+        <div class="card-title"><i class="bi bi-bar-chart"></i> Ringkasan Hasil Batch Processing</div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-number" id="statTotal">0</div><div class="stat-label">Total Data</div></div>
+            <div class="stat-card"><div class="stat-number" id="statPositif">0</div><div class="stat-label">Positif</div></div>
+            <div class="stat-card"><div class="stat-number" id="statNegatif">0</div><div class="stat-label">Negatif</div></div>
+            <div class="stat-card"><div class="stat-number" id="statNetral">0</div><div class="stat-label">Netral</div></div>
+            <div class="stat-card"><div class="stat-number" id="statValid">0</div><div class="stat-label">Berhasil</div></div>
+            <div class="stat-card"><div class="stat-number" id="statGagal">0</div><div class="stat-label">Gagal</div></div>
+        </div>
+        <button class="btn-outline-custom mt-2" onclick="downloadResultCSV()" id="downloadBtn" style="display: none;">
+            <i class="bi bi-download"></i> Download Hasil CSV
+        </button>
+    </div>
+
+    <!-- PREVIEW HASIL BATCH -->
+    <div class="card-custom" id="previewCard" style="display: none;">
+        <div class="card-title"><i class="bi bi-table"></i> Preview Hasil Analisis (10 data teratas)</div>
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead><tr><th>No</th><th>Teks</th><th>Sentimen</th><th>Confidence</th></tr>
+                </thead>
+                <tbody id="previewTable"></tbody>
+             </table>
+        </div>
+        <div class="text-muted mt-2" style="font-size: 0.6rem;" id="previewNote"></div>
+    </div>
+
+    <!-- RIWAYAT ANALISIS MANUAL -->
+    <div class="card-custom">
+        <div class="card-title"><i class="bi bi-clock-history"></i> Riwayat Analisis Manual</div>
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead><tr><th>No</th><th>Komentar</th><th>Sentimen</th><th>Confidence</th></tr>
+                </thead>
+                <tbody id="history"></tbody>
+             </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="overlay" id="loadingOverlay">
+    <div class="loading-box">
+        <div class="loading-spinner"></div>
+        <h5 id="loadingTitle">Memproses Data...</h5>
+        <p id="loadingSubtext" class="text-muted" style="font-size: 0.7rem;">Mohon tunggu</p>
+        <div class="progress mt-2" style="height: 4px; width: 100%; background: var(--accent-light); border-radius: 4px;">
+            <div id="progressBar" style="width: 0%; height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    Dibuat oleh <span>M. Rifqi Arista Aprilianto</span> · FinSense SVM · 2026
+</div>
+
+<script>
+let historyNo = 1;
+let batchResults = [];
+
+// ==================== PREDIKSI MANUAL ====================
+async function predictSentimen() {
+    let text = document.getElementById("text").value.trim();
+    if (!text) {
+        alert("Isi dulu komentar!");
+        return;
+    }
+
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = '<span class="text-muted">⏳ Memproses...</span>';
+
+    try {
+        const res = await fetch("/api/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text })
+        });
+        const data = await res.json();
+        let label = data.label || "netral";
+        let conf = data.confidence || 0;
+        let cleanText = data.clean_text || "-";
+
+        resultDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <span>Hasil Analisis:</span>
+                <span class="result-badge ${label}">${label.toUpperCase()}</span>
+                <span>Confidence: <strong>${(conf * 100).toFixed(2)}%</strong></span>
+            </div>
+        `;
+        document.getElementById("clean").innerHTML = `Preprocessing: ${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}`;
+        
+        // TAMBAH KE RIWAYAT
+        let tbody = document.getElementById("history");
+        let row = document.createElement("tr");
+        let shortText = text.length > 50 ? text.substring(0, 50) + "..." : text;
+        row.innerHTML = `
+             <td>${historyNo++}</td>
+            <td title="${escapeHtml(text)}">${escapeHtml(shortText)}</td>
+            <td><span class="result-badge ${label}" style="font-size: 0.6rem;">${label}</span></td>
+            <td>${(conf * 100).toFixed(2)}%</td>
+         `;
+        tbody.appendChild(row);
+        
+    } catch (err) {
+        resultDiv.innerHTML = '<span class="text-danger">❌ Server tidak terhubung</span>';
+        console.error(err);
+    }
+}
+
+// ==================== BATCH PROCESSING ====================
+async function processFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    document.getElementById("fileInfo").innerHTML = `<i class="bi bi-file-earmark-text"></i> File: ${file.name}`;
+
+    // BACA CSV
+    const text = await file.text();
+    const lines = text.split("\n");
+    const headers = lines[0].toLowerCase().split(",");
+    
+    // CARI KOLOM TEKS
+    let textColumn = null;
+    const possibleColumns = ["text", "tweet", "komentar", "content", "isi", "teks"];
+    for (let col of possibleColumns) {
+        for (let h of headers) {
+            if (h.trim() === col) {
+                textColumn = h.trim();
+                break;
+            }
+        }
+        if (textColumn) break;
+    }
+    
+    if (!textColumn) {
+        alert("File tidak memiliki kolom 'text', 'tweet', atau 'komentar'");
+        return;
+    }
+    
+    const colIndex = headers.indexOf(textColumn);
+    const texts = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+            let parts = lines[i].split(",");
+            if (parts[colIndex] && parts[colIndex].trim()) {
+                texts.push(parts[colIndex].trim());
+            }
+        }
+    }
+    
+    if (texts.length === 0) {
+        alert("Tidak ada data teks yang ditemukan");
+        return;
+    }
+    
+    await processBatch(texts);
+}
+
+async function processBatch(texts) {
+    const overlay = document.getElementById("loadingOverlay");
+    const progressBar = document.getElementById("progressBar");
+    const loadingSubtext = document.getElementById("loadingSubtext");
+    
+    overlay.style.display = "flex";
+    batchResults = [];
+    
+    progressBar.style.width = "0%";
+    
+    for (let i = 0; i < texts.length; i++) {
+        const text = texts[i];
+        try {
+            const res = await fetch("/api/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: text })
+            });
+            const data = await res.json();
+            batchResults.push({
+                original: text,
+                clean_text: data.clean_text || text,
+                label: data.label || "netral",
+                confidence: data.confidence || 0
+            });
+        } catch (err) {
+            batchResults.push({
+                original: text,
+                clean_text: text,
+                label: "error",
+                confidence: 0
+            });
+        }
+        
+        const percent = ((i + 1) / texts.length) * 100;
+        progressBar.style.width = percent + "%";
+        loadingSubtext.innerText = `${i + 1} / ${texts.length} data diproses`;
+    }
+    
+    setTimeout(() => {
+        overlay.style.display = "none";
+        showBatchResults();
+    }, 500);
+}
+
+function showBatchResults() {
+    const validResults = batchResults.filter(r => r.label !== "error");
+    const gagalCount = batchResults.length - validResults.length;
+    const positif = validResults.filter(r => r.label === "positif").length;
+    const negatif = validResults.filter(r => r.label === "negatif").length;
+    const netral = validResults.filter(r => r.label === "netral").length;
+    
+    document.getElementById("statsCard").style.display = "block";
+    document.getElementById("downloadBtn").style.display = "block";
+    document.getElementById("statTotal").innerText = batchResults.length;
+    document.getElementById("statPositif").innerText = positif;
+    document.getElementById("statNegatif").innerText = negatif;
+    document.getElementById("statNetral").innerText = netral;
+    document.getElementById("statValid").innerText = validResults.length;
+    document.getElementById("statGagal").innerText = gagalCount;
+    
+    // PREVIEW 10 DATA PERTAMA
+    const previewHtml = [];
+    for (let i = 0; i < Math.min(10, batchResults.length); i++) {
+        const r = batchResults[i];
+        let shortText = r.original.length > 60 ? r.original.substring(0, 60) + "..." : r.original;
+        previewHtml.push(`
+            <tr>
+                <td>${i + 1}</td>
+                <td title="${escapeHtml(r.original)}">${escapeHtml(shortText)}</td>
+                <td><span class="result-badge ${r.label === "error" ? "netral" : r.label}" style="font-size: 0.6rem;">${r.label === "error" ? "ERROR" : r.label}</span></td>
+                <td>${r.label !== "error" ? (r.confidence * 100).toFixed(2) + "%" : "-"}</td>
+            </tr>
+        `);
+    }
+    document.getElementById("previewTable").innerHTML = previewHtml.join("");
+    document.getElementById("previewCard").style.display = "block";
+    
+    let previewNote = batchResults.length > 10 ? `* Menampilkan 10 dari ${batchResults.length} data. Download CSV untuk melihat semua.` : `* Total ${batchResults.length} data.`;
+    document.getElementById("previewNote").innerHTML = previewNote;
+}
+
+// ================================================================
+// DOWNLOAD CSV - FORMAT RAPI DAN AMAN
+// ================================================================
+function downloadResultCSV() {
+    if (batchResults.length === 0) {
+        alert("Tidak ada data untuk diunduh!");
+        return;
+    }
+
+    // FUNGSI UNTUK MEMBERSIHKAN TEKS AGAR AMAN UNTUK CSV
+    function cleanCSV(text) {
+        if (text === null || text === undefined) return "";
+        text = String(text);
+        // Hapus baris baru
+        text = text.replace(/\r\n/g, " ").replace(/\n/g, " ").replace(/\r/g, " ");
+        // Hapus spasi berlebihan
+        text = text.replace(/\s+/g, " ").trim();
+        // Jika mengandung koma, kutip, atau karakter khusus, bungkus dengan kutip
+        if (text.includes(",") || text.includes('"') || text.includes("'") || text.includes("\n") || text.includes("\r")) {
+            text = text.replace(/"/g, '""'); // Escape kutip ganda
+            text = '"' + text + '"';
+        }
+        return text;
+    }
+
+    // BUAT HEADER CSV
+    var rows = [];
+    rows.push(["No", "Teks Asli", "Teks Bersih", "Sentimen", "Confidence"]);
+    
+    // ISI DATA
+    for (var i = 0; i < batchResults.length; i++) {
+        var r = batchResults[i];
+        var confidenceDisplay = r.label !== "error" ? (r.confidence * 100).toFixed(2) + "%" : "0%";
+        var labelDisplay = r.label === "error" ? "ERROR" : r.label;
+        
+        rows.push([
+            (i + 1),
+            cleanCSV(r.original || ""),
+            cleanCSV(r.clean_text || ""),
+            labelDisplay,
+            confidenceDisplay
+        ]);
+    }
+    
+    // BUAT KONTEN CSV
+    var csvContent = "";
+    for (var j = 0; j < rows.length; j++) {
+        csvContent += rows[j].join(",") + "\n";
+    }
+    
+    // TAMBAHKAN BOM UTF-8 AGAR EXCEL MEMBACA DENGAN BENAR
+    var bom = "\uFEFF";
+    var csvWithBom = bom + csvContent;
+    
+    // BUAT BLOB DAN DOWNLOAD
+    var blob = new Blob([csvWithBom], { type: "text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    
+    var a = document.createElement("a");
+    a.href = url;
+    var now = new Date();
+    var timestamp = now.getFullYear() + "-" + 
+                    String(now.getMonth() + 1).padStart(2, "0") + "-" + 
+                    String(now.getDate()).padStart(2, "0") + "_" +
+                    String(now.getHours()).padStart(2, "0") + "-" + 
+                    String(now.getMinutes()).padStart(2, "0") + "-" + 
+                    String(now.getSeconds()).padStart(2, "0");
+    a.download = "hasil_analisis_sentimen_" + timestamp + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// ================================================================
+// FUNGSI ESCAPE HTML UNTUK TAMPILAN
+// ================================================================
+function escapeHtml(text) {
+    if (!text) return "";
+    text = String(text);
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>
