@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Editor · FinSense SVM</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    background: #ede8df;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #2d5a4a;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #c9a03d;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.logo h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+}
+
+.logo h2 span {
+    color: #c9a03d;
+}
+
+.back-btn {
+    background: rgba(255,255,245,0.15);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,245,0.25);
+}
+
+/* TAB MENU */
+.tab-menu {
+    display: flex;
+    gap: 0.5rem;
+    background: #fffdf9;
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    border: 1px solid #e0d9cf;
+}
+
+.tab-btn {
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.tab-btn:hover {
+    background: #f0ece4;
+}
+
+.tab-btn.active {
+    background: #2d5a4a;
+    color: white;
+}
+
+.tab-btn.active i {
+    color: white;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+}
+
+/* TOOLBAR */
+.toolbar {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: #2d5a4a;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1e4a3a;
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background: #c9a03d;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #b88a2a;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #dad3c7;
+    color: #2a2a26;
+}
+
+.btn-outline:hover {
+    background: #f0ece4;
+}
+
+/* EDITOR CARD */
+.editor-card {
+    background: #fffdf9;
+    border: 1px solid #e0d9cf;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.editor-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid #c9a03d;
+    display: inline-block;
+}
+
+.editor-card h3 i {
+    margin-right: 0.3rem;
+    color: #c9a03d;
+}
+
+.field-group {
+    margin-bottom: 1rem;
+}
+
+.field-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #7a7a72;
+    margin-bottom: 0.3rem;
+}
+
+.field-group input,
+.field-group textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #e0d9cf;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-family: monospace;
+    background: white;
+}
+
+.field-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.field-group input:focus,
+.field-group textarea:focus {
+    outline: none;
+    border-color: #c9a03d;
+}
+
+.row-2cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.success-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2d5a4a;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.success-toast.show {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .row-2cols {
+        grid-template-columns: 1fr;
+    }
+    .tab-menu {
+        justify-content: center;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <div class="logo-icon"><i class="bi bi-pencil-square"></i></div>
+        <h2>Fin<span>Sense</span> Editor</h2>
+    </div>
+    <a href="/admin" class="back-btn">
+        <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+    </a>
+</div>
+
+<div class="container">
+    <!-- TAB MENU -->
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="switchTab('beranda')">
+            <i class="bi bi-house-door"></i> Beranda
+        </button>
+        <button class="tab-btn" onclick="switchTab('visualisasi')">
+            <i class="bi bi-bar-chart-steps"></i> Visualisasi
+        </button>
+        <button class="tab-btn" onclick="switchTab('analisis')">
+            <i class="bi bi-robot"></i> Analisis Sentimen
+        </button>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn btn-outline" onclick="resetToDefault()">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset ke Default
+        </button>
+        <button class="btn btn-warning" onclick="exportData()">
+            <i class="bi bi-download"></i> Export JSON
+        </button>
+        <button class="btn btn-outline" onclick="importData()">
+            <i class="bi bi-upload"></i> Import JSON
+        </button>
+        <button class="btn btn-primary" onclick="saveAllChanges()">
+            <i class="bi bi-save"></i> Simpan Semua
+        </button>
+        <input type="file" id="importFile" style="display: none" accept=".json" onchange="handleImport(event)">
+    </div>
+
+    <!-- TAB BERANDA -->
+    <div id="tab-beranda" class="tab-content">
+        <!-- Hero Section -->
+        <div class="editor-card">
+            <h3><i class="bi bi-megaphone"></i> Hero Section (Beranda)</h3>
+            <div class="field-group">
+                <label>Judul Utama (H2)</label>
+                <textarea id="beranda_heroTitle" rows="2">Analisis Sentimen Pengguna X terhadap Menteri Keuangan Purbaya Yudhi Sadewa menggunakan Support Vector Machine</textarea>
+            </div>
+            <div class="field-group">
+                <label>Badges (pisah dengan koma)</label>
+                <input type="text" id="beranda_heroBadges" value="SVM Linear, Twitter/X, Sep-Nov 2025, Menteri Keuangan">
+            </div>
+        </div>
+
+        <!-- Metrik -->
+        <div class="editor-card">
+            <h3><i class="bi bi-graph-up"></i> Metrik Model</h3>
+            <div class="row-2cols">
+                <div class="field-group"><label>Akurasi</label><input type="text" id="beranda_metricAkurasi" value="91,68%"></div>
+                <div class="field-group"><label>Presisi</label><input type="text" id="beranda_metricPresisi" value="92,17%"></div>
+                <div class="field-group"><label>Recall</label><input type="text" id="beranda_metricRecall" value="91,68%"></div>
+                <div class="field-group"><label>F1-Score</label><input type="text" id="beranda_metricF1" value="91,64%"></div>
+            </div>
+        </div>
+
+        <!-- Dataset -->
+        <div class="editor-card">
+            <h3><i class="bi bi-database"></i> Profil Dataset</h3>
+            <div class="row-2cols">
+                <div class="field-group"><label>Scraping awal</label><input type="text" id="beranda_datasetScraping" value="5.000 tweet"></div>
+                <div class="field-group"><label>Data bersih</label><input type="text" id="beranda_datasetBersih" value="4.210"></div>
+                <div class="field-group"><label>Data latih</label><input type="text" id="beranda_datasetTrain" value="2.404"></div>
+                <div class="field-group"><label>Data uji</label><input type="text" id="beranda_datasetTest" value="1.806"></div>
+                <div class="field-group"><label>Fitur TF-IDF</label><input type="text" id="beranda_datasetFitur" value="3.284"></div>
+                <div class="field-group"><label>Periode</label><input type="text" id="beranda_datasetPeriode" value="September - November 2025"></div>
+            </div>
+        </div>
+
+        <!-- Sentimen -->
+        <div class="editor-card">
+            <h3><i class="bi bi-pie-chart"></i> Distribusi Sentimen</h3>
+            <div class="row-2cols">
+                <div class="field-group"><label>Negatif</label><input type="text" id="beranda_sentimenNegatif" value="71,5% · 3.010"></div>
+                <div class="field-group"><label>Netral</label><input type="text" id="beranda_sentimenNetral" value="15% · 630"></div>
+                <div class="field-group"><label>Positif</label><input type="text" id="beranda_sentimenPositif" value="13,5% · 570"></div>
+            </div>
+            <div class="field-group">
+                <label>Kesimpulan Distribusi</label>
+                <textarea id="beranda_sentimenKesimpulan" rows="2">Mayoritas pengguna X memberikan opini negatif terhadap Menteri Keuangan Purbaya Yudhi Sadewa.</textarea>
+            </div>
+        </div>
+
+        <!-- Kesimpulan -->
+        <div class="editor-card">
+            <h3><i class="bi bi-chat-square-quote"></i> Kesimpulan Penelitian</h3>
+            <div class="field-group">
+                <label>Kesimpulan Akhir</label>
+                <textarea id="beranda_kesimpulanAkhir" rows="3">Metode Support Vector Machine (SVM) dengan kernel linear terbukti efektif untuk klasifikasi sentimen tiga kelas pada teks pendek berbahasa Indonesia. Selama periode September–November 2025, publik cenderung memberikan sentimen negatif terhadap Menteri Keuangan Purbaya Yudhi Sadewa.</textarea>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="editor-card">
+            <h3><i class="bi bi-person"></i> Footer</h3>
+            <div class="row-2cols">
+                <div class="field-group"><label>Nama Pembuat</label><input type="text" id="beranda_footerName" value="M. Rifqi Arista Aprilianto"></div>
+                <div class="field-group"><label>Tahun</label><input type="text" id="beranda_footerYear" value="2026"></div>
+                <div class="field-group"><label>Aplikasi</label><input type="text" id="beranda_footerApp" value="FinSense SVM"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB VISUALISASI -->
+    <div id="tab-visualisasi" class="tab-content" style="display: none;">
+        <div class="editor-card">
+            <h3><i class="bi bi-graph-up"></i> Judul Halaman Visualisasi</h3>
+            <div class="field-group">
+                <label>Judul Utama</label>
+                <input type="text" id="visualisasi_title" value="Visualisasi Data Sentimen">
+            </div>
+            <div class="field-group">
+                <label>Subjudul / Deskripsi</label>
+                <textarea id="visualisasi_subtitle" rows="2">Grafik dan visualisasi dari hasil analisis sentimen menggunakan metode Support Vector Machine (SVM)</textarea>
+            </div>
+        </div>
+
+        <div class="editor-card">
+            <h3><i class="bi bi-pie-chart"></i> Konfigurasi Chart</h3>
+            <div class="field-group">
+                <label>Label Positif</label>
+                <input type="text" id="visualisasi_labelPositif" value="Positif">
+            </div>
+            <div class="field-group">
+                <label>Label Negatif</label>
+                <input type="text" id="visualisasi_labelNegatif" value="Negatif">
+            </div>
+            <div class="field-group">
+                <label>Label Netral</label>
+                <input type="text" id="visualisasi_labelNetral" value="Netral">
+            </div>
+            <div class="field-group">
+                <label>Data Persentase (pisah koma: positif,negatif,netral)</label>
+                <input type="text" id="visualisasi_dataPersen" value="13.5,71.5,15">
+            </div>
+            <div class="field-group">
+                <label>Data Jumlah (pisah koma)</label>
+                <input type="text" id="visualisasi_dataJumlah" value="570,3010,630">
+            </div>
+        </div>
+
+        <div class="editor-card">
+            <h3><i class="bi bi-bar-chart"></i> Keterangan / Insight</h3>
+            <div class="field-group">
+                <label>Teks Insight</label>
+                <textarea id="visualisasi_insight" rows="3">Berdasarkan visualisasi di atas, dapat dilihat bahwa sentimen negatif mendominasi dengan persentase 71.5%, diikuti sentimen netral 15% dan positif 13.5%.</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB ANALISIS SENTIMEN -->
+    <div id="tab-analisis" class="tab-content" style="display: none;">
+        <div class="editor-card">
+            <h3><i class="bi bi-robot"></i> Judul Halaman Analisis</h3>
+            <div class="field-group">
+                <label>Judul Utama</label>
+                <input type="text" id="analisis_title" value="Analisis Sentimen Real-time">
+            </div>
+            <div class="field-group">
+                <label>Subjudul</label>
+                <textarea id="analisis_subtitle" rows="2">Masukkan teks untuk dianalisis sentimennya menggunakan model SVM yang telah dilatih</textarea>
+            </div>
+        </div>
+
+        <div class="editor-card">
+            <h3><i class="bi bi-chat-dots"></i> Label dan Placeholder</h3>
+            <div class="field-group">
+                <label>Label Input Teks</label>
+                <input type="text" id="analisis_inputLabel" value="Masukkan teks tweet / komentar">
+            </div>
+            <div class="field-group">
+                <label>Placeholder Textarea</label>
+                <input type="text" id="analisis_placeholder" value="Contoh: Kinerja Menteri Keuangan sangat baik dan transparan...">
+            </div>
+            <div class="field-group">
+                <label>Teks Tombol Analisis</label>
+                <input type="text" id="analisis_buttonText" value="Analisis Sentimen">
+            </div>
+        </div>
+
+        <div class="editor-card">
+            <h3><i class="bi bi-info-circle"></i> Hasil Analisis</h3>
+            <div class="field-group">
+                <label>Label Hasil Positif</label>
+                <input type="text" id="analisis_labelPositif" value="Positif 😊">
+            </div>
+            <div class="field-group">
+                <label>Label Hasil Negatif</label>
+                <input type="text" id="analisis_labelNegatif" value="Negatif 😠">
+            </div>
+            <div class="field-group">
+                <label>Label Hasil Netral</label>
+                <input type="text" id="analisis_labelNetral" value="Netral 😐">
+            </div>
+        </div>
+
+        <div class="editor-card">
+            <h3><i class="bi bi-file-text"></i> Contoh Teks</h3>
+            <div class="field-group">
+                <label>Contoh Teks (opsional)</label>
+                <textarea id="analisis_teksContoh" rows="2">Kebijakan fiskal saat ini sangat membantu masyarakat kecil. Terima kasih Pak Menteri!</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="successToast" class="success-toast">
+    <i class="bi bi-check-circle"></i> Perubahan tersimpan!
+</div>
+
+<script>
+// DEFAULT DATA
+const DEFAULT_DATA = {
+    beranda: {
+        heroTitle: "Analisis Sentimen Pengguna X terhadap Menteri Keuangan Purbaya Yudhi Sadewa menggunakan Support Vector Machine",
+        heroBadges: "SVM Linear, Twitter/X, Sep-Nov 2025, Menteri Keuangan",
+        metricAkurasi: "91,68%", metricPresisi: "92,17%", metricRecall: "91,68%", metricF1: "91,64%",
+        datasetScraping: "5.000 tweet", datasetBersih: "4.210", datasetTrain: "2.404", datasetTest: "1.806", datasetFitur: "3.284", datasetPeriode: "September - November 2025",
+        sentimenNegatif: "71,5% · 3.010", sentimenNetral: "15% · 630", sentimenPositif: "13,5% · 570",
+        sentimenKesimpulan: "Mayoritas pengguna X memberikan opini negatif terhadap Menteri Keuangan Purbaya Yudhi Sadewa.",
+        kesimpulanAkhir: "Metode Support Vector Machine (SVM) dengan kernel linear terbukti efektif untuk klasifikasi sentimen tiga kelas pada teks pendek berbahasa Indonesia. Selama periode September–November 2025, publik cenderung memberikan sentimen negatif terhadap Menteri Keuangan Purbaya Yudhi Sadewa.",
+        footerName: "M. Rifqi Arista Aprilianto", footerYear: "2026", footerApp: "FinSense SVM"
+    },
+    visualisasi: {
+        title: "Visualisasi Data Sentimen",
+        subtitle: "Grafik dan visualisasi dari hasil analisis sentimen menggunakan metode Support Vector Machine (SVM)",
+        labelPositif: "Positif", labelNegatif: "Negatif", labelNetral: "Netral",
+        dataPersen: "13.5,71.5,15", dataJumlah: "570,3010,630",
+        insight: "Berdasarkan visualisasi di atas, dapat dilihat bahwa sentimen negatif mendominasi dengan persentase 71.5%, diikuti sentimen netral 15% dan positif 13.5%."
+    },
+    analisis: {
+        title: "Analisis Sentimen Real-time",
+        subtitle: "Masukkan teks untuk dianalisis sentimennya menggunakan model SVM yang telah dilatih",
+        inputLabel: "Masukkan teks tweet / komentar",
+        placeholder: "Contoh: Kinerja Menteri Keuangan sangat baik dan transparan...",
+        buttonText: "Analisis Sentimen",
+        labelPositif: "Positif 😊", labelNegatif: "Negatif 😠", labelNetral: "Netral 😐",
+        teksContoh: "Kebijakan fiskal saat ini sangat membantu masyarakat kecil. Terima kasih Pak Menteri!"
+    }
+};
+
+// LOAD DATA
+function loadData() {
+    const saved = localStorage.getItem("finsense_all_data");
+    let data = saved ? JSON.parse(saved) : DEFAULT_DATA;
+    
+    // Beranda
+    document.getElementById("beranda_heroTitle").value = data.beranda.heroTitle;
+    document.getElementById("beranda_heroBadges").value = data.beranda.heroBadges;
+    document.getElementById("beranda_metricAkurasi").value = data.beranda.metricAkurasi;
+    document.getElementById("beranda_metricPresisi").value = data.beranda.metricPresisi;
+    document.getElementById("beranda_metricRecall").value = data.beranda.metricRecall;
+    document.getElementById("beranda_metricF1").value = data.beranda.metricF1;
+    document.getElementById("beranda_datasetScraping").value = data.beranda.datasetScraping;
+    document.getElementById("beranda_datasetBersih").value = data.beranda.datasetBersih;
+    document.getElementById("beranda_datasetTrain").value = data.beranda.datasetTrain;
+    document.getElementById("beranda_datasetTest").value = data.beranda.datasetTest;
+    document.getElementById("beranda_datasetFitur").value = data.beranda.datasetFitur;
+    document.getElementById("beranda_datasetPeriode").value = data.beranda.datasetPeriode;
+    document.getElementById("beranda_sentimenNegatif").value = data.beranda.sentimenNegatif;
+    document.getElementById("beranda_sentimenNetral").value = data.beranda.sentimenNetral;
+    document.getElementById("beranda_sentimenPositif").value = data.beranda.sentimenPositif;
+    document.getElementById("beranda_sentimenKesimpulan").value = data.beranda.sentimenKesimpulan;
+    document.getElementById("beranda_kesimpulanAkhir").value = data.beranda.kesimpulanAkhir;
+    document.getElementById("beranda_footerName").value = data.beranda.footerName;
+    document.getElementById("beranda_footerYear").value = data.beranda.footerYear;
+    document.getElementById("beranda_footerApp").value = data.beranda.footerApp;
+    
+    // Visualisasi
+    document.getElementById("visualisasi_title").value = data.visualisasi.title;
+    document.getElementById("visualisasi_subtitle").value = data.visualisasi.subtitle;
+    document.getElementById("visualisasi_labelPositif").value = data.visualisasi.labelPositif;
+    document.getElementById("visualisasi_labelNegatif").value = data.visualisasi.labelNegatif;
+    document.getElementById("visualisasi_labelNetral").value = data.visualisasi.labelNetral;
+    document.getElementById("visualisasi_dataPersen").value = data.visualisasi.dataPersen;
+    document.getElementById("visualisasi_dataJumlah").value = data.visualisasi.dataJumlah;
+    document.getElementById("visualisasi_insight").value = data.visualisasi.insight;
+    
+    // Analisis
+    document.getElementById("analisis_title").value = data.analisis.title;
+    document.getElementById("analisis_subtitle").value = data.analisis.subtitle;
+    document.getElementById("analisis_inputLabel").value = data.analisis.inputLabel;
+    document.getElementById("analisis_placeholder").value = data.analisis.placeholder;
+    document.getElementById("analisis_buttonText").value = data.analisis.buttonText;
+    document.getElementById("analisis_labelPositif").value = data.analisis.labelPositif;
+    document.getElementById("analisis_labelNegatif").value = data.analisis.labelNegatif;
+    document.getElementById("analisis_labelNetral").value = data.analisis.labelNetral;
+    document.getElementById("analisis_teksContoh").value = data.analisis.teksContoh;
+}
+
+// SAVE ALL
+function saveAllChanges() {
+    const data = {
+        beranda: {
+            heroTitle: document.getElementById("beranda_heroTitle").value,
+            heroBadges: document.getElementById("beranda_heroBadges").value,
+            metricAkurasi: document.getElementById("beranda_metricAkurasi").value,
+            metricPresisi: document.getElementById("beranda_metricPresisi").value,
+            metricRecall: document.getElementById("beranda_metricRecall").value,
+            metricF1: document.getElementById("beranda_metricF1").value,
+            datasetScraping: document.getElementById("beranda_datasetScraping").value,
+            datasetBersih: document.getElementById("beranda_datasetBersih").value,
+            datasetTrain: document.getElementById("beranda_datasetTrain").value,
+            datasetTest: document.getElementById("beranda_datasetTest").value,
+            datasetFitur: document.getElementById("beranda_datasetFitur").value,
+            datasetPeriode: document.getElementById("beranda_datasetPeriode").value,
+            sentimenNegatif: document.getElementById("beranda_sentimenNegatif").value,
+            sentimenNetral: document.getElementById("beranda_sentimenNetral").value,
+            sentimenPositif: document.getElementById("beranda_sentimenPositif").value,
+            sentimenKesimpulan: document.getElementById("beranda_sentimenKesimpulan").value,
+            kesimpulanAkhir: document.getElementById("beranda_kesimpulanAkhir").value,
+            footerName: document.getElementById("beranda_footerName").value,
+            footerYear: document.getElementById("beranda_footerYear").value,
+            footerApp: document.getElementById("beranda_footerApp").value
+        },
+        visualisasi: {
+            title: document.getElementById("visualisasi_title").value,
+            subtitle: document.getElementById("visualisasi_subtitle").value,
+            labelPositif: document.getElementById("visualisasi_labelPositif").value,
+            labelNegatif: document.getElementById("visualisasi_labelNegatif").value,
+            labelNetral: document.getElementById("visualisasi_labelNetral").value,
+            dataPersen: document.getElementById("visualisasi_dataPersen").value,
+            dataJumlah: document.getElementById("visualisasi_dataJumlah").value,
+            insight: document.getElementById("visualisasi_insight").value
+        },
+        analisis: {
+            title: document.getElementById("analisis_title").value,
+            subtitle: document.getElementById("analisis_subtitle").value,
+            inputLabel: document.getElementById("analisis_inputLabel").value,
+            placeholder: document.getElementById("analisis_placeholder").value,
+            buttonText: document.getElementById("analisis_buttonText").value,
+            labelPositif: document.getElementById("analisis_labelPositif").value,
+            labelNegatif: document.getElementById("analisis_labelNegatif").value,
+            labelNetral: document.getElementById("analisis_labelNetral").value,
+            teksContoh: document.getElementById("analisis_teksContoh").value
+        }
+    };
+    
+    localStorage.setItem("finsense_all_data", JSON.stringify(data));
+    localStorage.setItem("finsense_home_data", JSON.stringify(data.beranda));
+    localStorage.setItem("finsense_visualisasi_data", JSON.stringify(data.visualisasi));
+    localStorage.setItem("finsense_analisis_data", JSON.stringify(data.analisis));
+    
+    showToast();
+}
+
+function resetToDefault() {
+    if (confirm("Reset semua data ke default?")) {
+        localStorage.setItem("finsense_all_data", JSON.stringify(DEFAULT_DATA));
+        localStorage.setItem("finsense_home_data", JSON.stringify(DEFAULT_DATA.beranda));
+        localStorage.setItem("finsense_visualisasi_data", JSON.stringify(DEFAULT_DATA.visualisasi));
+        localStorage.setItem("finsense_analisis_data", JSON.stringify(DEFAULT_DATA.analisis));
+        loadData();
+        showToast("Reset ke default berhasil");
+    }
+}
+
+function exportData() {
+    const saved = localStorage.getItem("finsense_all_data");
+    const data = saved || JSON.stringify(DEFAULT_DATA);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `finsense_backup_${new Date().toISOString().slice(0,19)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importData() {
+    document.getElementById("importFile").click();
+}
+
+function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            localStorage.setItem("finsense_all_data", JSON.stringify(data));
+            localStorage.setItem("finsense_home_data", JSON.stringify(data.beranda));
+            localStorage.setItem("finsense_visualisasi_data", JSON.stringify(data.visualisasi));
+            localStorage.setItem("finsense_analisis_data", JSON.stringify(data.analisis));
+            loadData();
+            showToast("Import berhasil!");
+        } catch(err) {
+            alert("File JSON tidak valid");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById(`tab-${tab}`).style.display = 'block';
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.tab-btn').classList.add('active');
+}
+
+function showToast(msg = "Perubahan tersimpan!") {
+    const toast = document.getElementById("successToast");
+    toast.innerHTML = `<i class="bi bi-check-circle"></i> ${msg}`;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+loadData();
+</script>
+</body>
+</html>

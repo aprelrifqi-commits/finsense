@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FinSense SVM · Admin Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    background: #ede8df;
+    color: #2a2a26;
+}
+
+/* NAVBAR ADMIN */
+.navbar {
+    background: #2d5a4a;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #c9a03d;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.logo h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+}
+
+.logo h2 span {
+    color: #c9a03d;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.nav-menu a {
+    color: rgba(255,255,245,0.85);
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.nav-menu a:hover {
+    background: rgba(255,255,245,0.15);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.nav-menu a.active {
+    background: rgba(255,255,245,0.2);
+    color: white;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+    background: rgba(255,255,245,0.15);
+    color: #ffcccc;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.logout-btn:hover {
+    background: rgba(255,100,100,0.3);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* MAIN CONTENT */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* GREETING */
+.greeting {
+    margin-bottom: 1.5rem;
+}
+
+.greeting h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d5a4a;
+}
+
+.greeting p {
+    color: #7a7a72;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+/* STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: #fffdf9;
+    border: 1px solid #e0d9cf;
+    border-radius: 20px;
+    padding: 1rem;
+    text-align: center;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    border-color: #c9a03d;
+}
+
+.stat-icon {
+    font-size: 1.8rem;
+    color: #c9a03d;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d5a4a;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #7a7a72;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ROW */
+.row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.col {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* CARD */
+.card {
+    background: #fffdf9;
+    border: 1px solid #e0d9cf;
+    border-radius: 20px;
+    padding: 1.2rem;
+    height: 100%;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #c9a03d;
+    display: inline-block;
+}
+
+.card-title i {
+    margin-right: 0.4rem;
+    color: #c9a03d;
+}
+
+/* MENU GRID - TAMBAHKAN EDIT KONTEN DI SINI */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.menu-item {
+    background: #f0ece4;
+    border-radius: 14px;
+    padding: 0.8rem;
+    text-align: center;
+    text-decoration: none;
+    color: #2a2a26;
+    transition: 0.2s;
+    display: block;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background: #c9a03d;
+    color: white;
+    transform: translateY(-3px);
+}
+
+.menu-item i {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.menu-item span {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+/* CHART */
+canvas {
+    max-height: 200px;
+    width: 100%;
+}
+
+/* INFO LIST */
+.info-list {
+    list-style: none;
+}
+
+.info-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e0d9cf;
+    font-size: 0.75rem;
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #7a7a72;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #2d5a4a;
+}
+
+/* ACTIVITY */
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #e0d9cf;
+    cursor: pointer;
+}
+
+.activity-item:hover {
+    background: #f5f0e8;
+    border-radius: 10px;
+    padding-left: 0.3rem;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    background: #f0ece4;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c9a03d;
+}
+
+.activity-text {
+    flex: 1;
+}
+
+.activity-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.activity-time {
+    font-size: 0.6rem;
+    color: #7a7a72;
+}
+
+/* FOOTER */
+.footer {
+    border-top: 1px solid #e0d9cf;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.65rem;
+    color: #7a7a72;
+    margin-top: 1rem;
+}
+
+.footer span {
+    font-weight: 500;
+    color: #2d5a4a;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+    }
+    .container {
+        padding: 1rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR ADMIN -->
+<div class="navbar">
+    <div class="logo">
+        <div class="logo-icon"><i class="bi bi-calculator-fill"></i></div>
+        <h2>Fin<span>Sense</span> SVM</h2>
+    </div>
+    <div class="nav-menu">
+        <a href="/admin" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/scraping"><i class="bi bi-twitter-x"></i> Scraping</a>
+        <a href="/visualisasi"><i class="bi bi-bar-chart-steps"></i> Visualisasi</a>
+        <a href="/analisis"><i class="bi bi-robot"></i> Analisis</a>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+    <!-- GREETING -->
+    <div class="greeting">
+        <h1>Selamat datang, Admin 👋</h1>
+        <p>Dashboard monitoring sistem analisis sentimen Menteri Keuangan Purbaya Yudhi Sadewa</p>
+    </div>
+
+    <!-- STATS GRID -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="location.href='/scraping'">
+            <div class="stat-icon"><i class="bi bi-database"></i></div>
+            <div class="stat-number">4.210</div>
+            <div class="stat-label">Total Data</div>
+        </div>
+        <div class="stat-card" onclick="location.href='/visualisasi'">
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-number">91,68%</div>
+            <div class="stat-label">Akurasi SVM</div>
+        </div>
+        <div class="stat-card" onclick="location.href='/visualisasi'">
+            <div class="stat-icon"><i class="bi bi-graph-up"></i></div>
+            <div class="stat-number">42%</div>
+            <div class="stat-label">Sentimen Positif</div>
+        </div>
+        <div class="stat-card" onclick="location.href='/visualisasi'">
+            <div class="stat-icon"><i class="bi bi-graph-down"></i></div>
+            <div class="stat-number">35%</div>
+            <div class="stat-label">Sentimen Negatif</div>
+        </div>
+        <div class="stat-card" onclick="location.href='/visualisasi'">
+            <div class="stat-icon"><i class="bi bi-bar-chart"></i></div>
+            <div class="stat-number">23%</div>
+            <div class="stat-label">Sentimen Netral</div>
+        </div>
+        <div class="stat-card" onclick="location.href='/about'">
+            <div class="stat-icon"><i class="bi bi-cpu"></i></div>
+            <div class="stat-number">3.284</div>
+            <div class="stat-label">Fitur TF-IDF</div>
+        </div>
+    </div>
+
+    <!-- ROW 1: MENU & CHART -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-grid"></i> Menu Aplikasi
+                </div>
+                <div class="menu-grid">
+                    <a href="/scraping" class="menu-item">
+                        <i class="bi bi-twitter-x"></i>
+                        <span>Scraping Data</span>
+                    </a>
+                    <a href="/visualisasi" class="menu-item">
+                        <i class="bi bi-bar-chart-steps"></i>
+                        <span>Visualisasi</span>
+                    </a>
+                    <a href="/analisis" class="menu-item">
+                        <i class="bi bi-robot"></i>
+                        <span>Analisis Sentimen</span>
+                    </a>
+                    <!-- TAMBAHAN MENU EDIT KONTEN -->
+                    <a href="/admin-editor" class="menu-item">
+                         <i class="bi bi-pencil-square"></i>
+                             <span>Edit Konten</span>
+                        </a>
+                    <a href="/" class="menu-item">
+                        <i class="bi bi-house-door"></i>
+                        <span>Beranda</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-pie-chart"></i> Distribusi Sentimen
+                </div>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 2: INFO MODEL & AKTIVITAS -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-info-circle"></i> Informasi Model SVM
+                </div>
+                <ul class="info-list">
+                    <li><span class="info-label">Metode</span><span class="info-value">LinearSVC (SVM)</span></li>
+                    <li><span class="info-label">Ekstraksi Fitur</span><span class="info-value">TF-IDF (ngram 1-2)</span></li>
+                    <li><span class="info-label">Dataset</span><span class="info-value">Twitter/X (4.210 data)</span></li>
+                    <li><span class="info-label">Validasi</span><span class="info-value">5-Fold Cross Validation</span></li>
+                    <li><span class="info-label">Akurasi</span><span class="info-value">91,68%</span></li>
+                    <li><span class="info-label">Presisi</span><span class="info-value">92,17%</span></li>
+                    <li><span class="info-label">Recall</span><span class="info-value">91,68%</span></li>
+                    <li><span class="info-label">F1-Score</span><span class="info-value">91,64%</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-clock-history"></i> Aktivitas Terakhir
+                </div>
+                <div class="activity-item" onclick="location.href='/scraping'">
+                    <div class="activity-icon"><i class="bi bi-twitter-x"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-title">Scraping Data Twitter</div>
+                        <div class="activity-time">Terakhir: November 2025 · 4.210 tweet</div>
+                    </div>
+                </div>
+                <div class="activity-item" onclick="location.href='/about'">
+                    <div class="activity-icon"><i class="bi bi-cpu"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-title">Training Model SVM</div>
+                        <div class="activity-time">LinearSVC · C=1.0 · 5-fold CV</div>
+                    </div>
+                </div>
+                <div class="activity-item" onclick="location.href='/visualisasi'">
+                    <div class="activity-icon"><i class="bi bi-graph-up"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-title">Evaluasi Model</div>
+                        <div class="activity-time">Akurasi 91,68% · F1 91,64%</div>
+                    </div>
+                </div>
+                <div class="activity-item" onclick="location.href='/analisis'">
+                    <div class="activity-icon"><i class="bi bi-file-text"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-title">Export Hasil Analisis</div>
+                        <div class="activity-time">CSV · Format standar</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 3: TREND & KESIMPULAN -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-graph-up"></i> Tren Sentimen (Sep-Nov 2025)
+                </div>
+                <canvas id="lineChart"></canvas>
+                <div class="text-muted" style="font-size: 0.6rem; text-align: center; margin-top: 0.5rem;">
+                    Perkembangan sentimen positif selama periode penelitian
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-chat-square-quote"></i> Kesimpulan
+                </div>
+                <div style="background: #f0ece4; padding: 0.8rem; border-radius: 12px;">
+                    <p style="font-size: 0.75rem; line-height: 1.5; margin-bottom: 0.5rem;">
+                        Model <strong>SVM (LinearSVC) + TF-IDF</strong> mencapai akurasi <strong>91,68%</strong> dengan F1-Score <strong>91,64%</strong>.
+                    </p>
+                    <p style="font-size: 0.75rem; line-height: 1.5; margin-bottom: 0.5rem;">
+                        Distribusi sentimen: <strong style="color:#2d6a4f;">Positif 42%</strong> · <strong style="color:#9e9580;">Netral 23%</strong> · <strong style="color:#b8734a;">Negatif 35%</strong>.
+                    </p>
+                    <p style="font-size: 0.75rem; line-height: 1.5;">
+                        Mayoritas opini publik cenderung <strong>positif</strong> terhadap Menteri Keuangan Purbaya Yudhi Sadewa.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    Dibuat oleh <span>M. Rifqi Arista Aprilianto</span> · FinSense SVM · 2026
+</div>
+
+<script>
+// PIE CHART
+new Chart(document.getElementById("pieChart"), {
+    type: "pie",
+    data: {
+        labels: ["Positif (42%)", "Negatif (35%)", "Netral (23%)"],
+        datasets: [{
+            data: [42, 35, 23],
+            backgroundColor: ["#2d6a4f", "#b8734a", "#9e9580"],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 9 } } }
+        }
+    }
+});
+
+// LINE CHART TREND
+new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+        labels: ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4", "Minggu 5"],
+        datasets: [{
+            label: "Sentimen Positif (%)",
+            data: [38, 40, 42, 41, 42],
+            borderColor: "#2d6a4f",
+            backgroundColor: "rgba(45, 106, 79, 0.05)",
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: "#c9a03d",
+            pointRadius: 3,
+            pointHoverRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: { beginAtZero: true, max: 100, grid: { color: "#e0d9cf" } },
+            x: { grid: { display: false } }
+        },
+        plugins: { legend: { position: 'top', labels: { font: { size: 9 } } } }
+    }
+});
+
+// FUNGSI LOGOUT
+function logout() {
+    if (confirm("Apakah Anda yakin ingin keluar dari halaman admin?")) {
+        window.location.href = "/";
+    }
+}
+</script>
+</body>
+</html>
