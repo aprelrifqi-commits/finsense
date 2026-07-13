@@ -55,6 +55,7 @@ body.dark {
 body {
     background: var(--bg);
     color: var(--text);
+    transition: background 0.3s, color 0.3s;
 }
 
 /* NAVBAR */
@@ -65,6 +66,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .navbar .container {
@@ -87,6 +89,7 @@ body {
     justify-content: center;
     position: relative;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: background 0.3s;
 }
 
 .logo i {
@@ -109,6 +112,7 @@ body {
     font-weight: 700;
     margin: 0;
     color: var(--text);
+    transition: color 0.3s;
 }
 
 .nav-brand-text h1 span {
@@ -127,6 +131,7 @@ body {
     display: flex;
     gap: 0.2rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .nav-btn {
@@ -138,6 +143,7 @@ body {
     font-weight: 500;
     color: var(--text);
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .nav-btn:hover {
@@ -154,9 +160,16 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* TOMBOL LOGIN / ADMIN */
+.dark-btn:hover {
+    transform: translateY(-1px) scale(1.05);
+}
+
+/* TOMBOL ADMIN / LOGIN */
 .admin-btn {
     background: linear-gradient(135deg, var(--gold), var(--accent));
     color: white;
@@ -167,10 +180,13 @@ body {
     font-weight: 600;
     transition: all 0.2s ease;
     margin-left: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
 .admin-btn i {
-    margin-right: 0.3rem;
     font-size: 0.75rem;
 }
 
@@ -180,12 +196,39 @@ body {
     background: linear-gradient(135deg, #e0b04b, #1e4a3a);
 }
 
+/* TOMBOL LOGOUT DI NAVBAR */
+.logout-btn-nav {
+    background: rgba(184, 115, 74, 0.15);
+    color: var(--clay);
+    border: 1px solid var(--clay);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: none;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.logout-btn-nav:hover {
+    background: var(--clay);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.logout-btn-nav.show {
+    display: inline-flex;
+}
+
 /* HERO */
 .hero {
     background: linear-gradient(135deg, var(--accent) 0%, #1e4a3a 100%);
     padding: 1.8rem 1rem;
     position: relative;
     overflow: hidden;
+    transition: background 0.3s;
 }
 
 .hero::before {
@@ -242,7 +285,7 @@ body {
     border-radius: 12px;
     padding: 0.8rem;
     text-align: center;
-    transition: 0.2s;
+    transition: all 0.2s;
 }
 
 .metric-card:hover {
@@ -275,6 +318,7 @@ body {
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 1rem;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .card-title {
@@ -321,6 +365,7 @@ body {
     font-size: 0.55rem;
     font-weight: 600;
     color: var(--accent);
+    flex-shrink: 0;
 }
 
 .timeline-step {
@@ -401,6 +446,7 @@ body.dark .bar-pos { background: #4a7a6a; }
     padding: 0.8rem;
     border-radius: 10px;
     margin: 0.8rem 0;
+    transition: background 0.3s;
 }
 
 .conclusion-box p {
@@ -428,14 +474,39 @@ body.dark .bar-pos { background: #4a7a6a; }
     font-size: 0.6rem;
     overflow-x: auto;
     margin-top: 0.5rem;
+    transition: background 0.3s;
 }
 
-/* FOOTER PROFESIONAL */
+/* TOAST NOTIFICATION */
+.toast-notif {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--accent);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.toast-notif.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* FOOTER */
 .footer {
     border-top: 1px solid var(--border);
     background: var(--card);
     padding: 1rem;
     margin-top: 1.5rem;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .footer .container {
@@ -451,13 +522,31 @@ body.dark .bar-pos { background: #4a7a6a; }
     font-weight: 500;
     color: var(--accent);
 }
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+    .nav-links {
+        gap: 0.1rem;
+    }
+    .nav-btn {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.5rem;
+    }
+    .admin-btn {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.6rem;
+        margin-left: 0.2rem;
+    }
+    .dark-btn {
+        width: 26px;
+        height: 26px;
+    }
+}
 </style>
 </head>
-<!-- Loader untuk data dari admin editor -->
-<script src="{{ url_for('static', filename='js/home_loader.js') }}"></script>
 <body>
 
-<!-- NAVBAR DENGAN TOMBOL LOGIN ADMIN -->
+<!-- NAVBAR -->
 <nav class="navbar">
     <div class="container">
         <div class="nav-brand">
@@ -470,13 +559,21 @@ body.dark .bar-pos { background: #4a7a6a; }
             </div>
         </div>
         <div class="nav-links">
-            <button class="nav-btn" onclick="location.href='index.html'">Beranda</button>
-            <button class="nav-btn" onclick="location.href='scraping.html'">Scraping</button>
-            <button class="nav-btn" onclick="location.href='about.html'">Model</button>
-            <button class="nav-btn" onclick="location.href='visualisasi.html'">Visual</button>
-            <button class="admin-btn" onclick="location.href='/admin'">
-                <i class="bi bi-shield-lock-fill">+</i> 
+            <button class="nav-btn" onclick="location.href='/'">Beranda</button>
+            <button class="nav-btn" onclick="location.href='/scraping'">Scraping</button>
+            <button class="nav-btn" onclick="location.href='/about'">Model</button>
+            <button class="nav-btn" onclick="location.href='/visualisasi'">Visual</button>
+            
+            <!-- TOMBOL ADMIN - SELALU MENUJU KE LOGIN -->
+            <button class="admin-btn" id="adminBtn" onclick="handleAdminClick()">
+                <i class="bi bi-shield-lock-fill"></i> Admin
             </button>
+            
+            <!-- TOMBOL LOGOUT (HANYA MUNCUL SAAT LOGIN) -->
+            <button class="logout-btn-nav" id="logoutBtnNav" onclick="handleLogout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+            
             <button class="nav-btn dark-btn" id="darkModeToggle">
                 <i class="bi bi-moon-stars"></i>
             </button>
@@ -495,7 +592,7 @@ body.dark .bar-pos { background: #4a7a6a; }
                     <span class="hero-badge">Sep-Nov 2025</span>
                     <span class="hero-badge">Menteri Keuangan</span>
                 </div>
-                <h2>Analisis Sentimen Pengguna X terhadap Menteri Keuangan Purbaya Yudhi Sadewa menggunakan Support Vector Machine</h2>
+                <h2 id="heroTitle">Analisis Sentimen Pengguna X terhadap Menteri Keuangan Purbaya Yudhi Sadewa menggunakan Support Vector Machine</h2>
             </div>
         </div>
     </div>
@@ -507,19 +604,19 @@ body.dark .bar-pos { background: #4a7a6a; }
     <!-- 4 METRIK -->
     <div class="metric-grid">
         <div class="metric-card">
-            <div class="metric-number">91,68%</div>
+            <div class="metric-number" id="metricAkurasi">91,68%</div>
             <div class="metric-label">Akurasi</div>
         </div>
         <div class="metric-card">
-            <div class="metric-number">92,17%</div>
+            <div class="metric-number" id="metricPresisi">92,17%</div>
             <div class="metric-label">Presisi</div>
         </div>
         <div class="metric-card">
-            <div class="metric-number">91,68%</div>
+            <div class="metric-number" id="metricRecall">91,68%</div>
             <div class="metric-label">Recall</div>
         </div>
         <div class="metric-card">
-            <div class="metric-number">91,64%</div>
+            <div class="metric-number" id="metricF1">91,64%</div>
             <div class="metric-label">F1-Score</div>
         </div>
     </div>
@@ -690,7 +787,15 @@ body.dark .bar-pos { background: #4a7a6a; }
     </div>
 </footer>
 
+<!-- TOAST NOTIFICATION -->
+<div class="toast-notif" id="toastNotif">
+    <i class="bi bi-check-circle"></i> <span id="toastMsg">Selamat datang!</span>
+</div>
+
 <script>
+// ================================================================
+// 1. DARK MODE
+// ================================================================
 const toggleBtn = document.getElementById('darkModeToggle');
 const icon = toggleBtn.querySelector('i');
 
@@ -712,6 +817,81 @@ toggleBtn.addEventListener('click', () => {
         icon.classList.add('bi-moon-stars');
     }
 });
+
+// ================================================================
+// 2. ADMIN LOGIN STATUS - HANYA UNTUK TAMPILAN
+// ================================================================
+function updateAdminUI() {
+    const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+    const adminBtn = document.getElementById('adminBtn');
+    const logoutBtn = document.getElementById('logoutBtnNav');
+    
+    if (isLoggedIn) {
+        const username = sessionStorage.getItem('admin_username') || 'Admin';
+        adminBtn.innerHTML = `<i class="bi bi-shield-lock-fill"></i> ${username}`;
+        adminBtn.style.background = 'linear-gradient(135deg, #2d6a4f, var(--accent))';
+        logoutBtn.classList.add('show');
+    } else {
+        adminBtn.innerHTML = `<i class="bi bi-shield-lock-fill"></i> Admin`;
+        adminBtn.style.background = 'linear-gradient(135deg, var(--gold), var(--accent))';
+        logoutBtn.classList.remove('show');
+    }
+}
+
+// ================================================================
+// 3. HANDLE ADMIN CLICK - SELALU KE HALAMAN LOGIN
+// ================================================================
+function handleAdminClick() {
+    // SELALU ARAHKAN KE HALAMAN LOGIN ADMIN
+    window.location.href = '/admin-login';
+}
+
+// ================================================================
+// 4. HANDLE LOGOUT - TERHUBUNG KE LOGOUT
+// ================================================================
+function handleLogout() {
+    if (confirm('Apakah Anda yakin ingin logout?')) {
+        sessionStorage.removeItem('admin_logged_in');
+        sessionStorage.removeItem('admin_username');
+        sessionStorage.removeItem('admin_login_time');
+        updateAdminUI();
+        showToast('Berhasil logout!');
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1000);
+    }
+}
+
+// ================================================================
+// 5. TOAST NOTIFICATION
+// ================================================================
+function showToast(msg) {
+    const toast = document.getElementById('toastNotif');
+    const toastMsg = document.getElementById('toastMsg');
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ================================================================
+// 6. INISIALISASI
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminUI();
+    
+    if (sessionStorage.getItem('admin_logged_in') === 'true') {
+        const username = sessionStorage.getItem('admin_username') || 'Admin';
+        showToast(`Selamat datang, ${username}!`);
+    }
+    
+    console.log('🏦 FinSense SVM - Halaman Beranda');
+    console.log('🔐 Klik Admin untuk login ke sistem');
+});
+
+// Cek login secara periodik
+setInterval(() => {
+    updateAdminUI();
+}, 5000);
 </script>
 </body>
 </html>
