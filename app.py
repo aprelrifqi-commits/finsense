@@ -3,8 +3,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 import os
 import re
-import threading
-import webbrowser
+import secrets
 from datetime import datetime
 from functools import wraps
 
@@ -19,14 +18,14 @@ app = Flask(
     static_folder=os.path.join(BASE_DIR, "static")
 )
 
-app.config["SECRET_KEY"] = "admin_secret_key_2026_change_this"
+# PENTING: Gunakan environment variable untuk SECRET_KEY
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", secrets.token_hex(16))
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["PERMANENT_SESSION_LIFETIME"] = 3600  # 1 jam
 
 CORS(app)
 
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*"
-)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # ==========================================
 # LOGIN REQUIRED DECORATOR
@@ -67,14 +66,23 @@ def about():
 # ==========================================
 @app.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
+    if session.get('admin_logged_in'):
+        return redirect(url_for('admin_dashboard'))
+    
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
         
-        # Ganti dengan username dan password yang Anda inginkan
-        if username == "admin" and password == "admin123":
+        # Ganti dengan environment variable untuk keamanan
+        ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
+        ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin_logged_in'] = True
             session['admin_username'] = username
+            session['admin_login_time'] = datetime.now().isoformat()
+            session.permanent = True
+            
             return redirect(url_for('admin_dashboard'))
         else:
             return render_template("admin_login.html", error="Username atau password salah!")
@@ -84,7 +92,7 @@ def admin_login():
 @app.route("/admin-logout")
 def admin_logout():
     session.clear()
-    return redirect(url_for('admin_login'))
+    return redirect(url_for('home'))
 
 # ==========================================
 # ADMIN DASHBOARD
@@ -94,43 +102,13 @@ def admin_logout():
 def admin_dashboard():
     return render_template("admin.html")
 
-# ==========================================
-# ADMIN EDITOR - EDIT SEMUA HALAMAN
-# ==========================================
 @app.route("/admin-editor")
 @login_required
 def admin_editor():
     return render_template("admin_editor.html")
 
 # ==========================================
-# API UNTUK MENYIMPAN DATA (opsional - untuk backend save)
-# ==========================================
-@app.route("/api/save-content", methods=["POST"])
-@login_required
-def save_content():
-    """Menyimpan konten ke file JSON (opsional, untuk penyimpanan permanen)"""
-    data = request.get_json()
-    page = data.get('page')
-    content = data.get('content')
-    
-    if not page or not content:
-        return jsonify({"status": "error", "message": "Data tidak lengkap"}), 400
-    
-    # Simpan ke file JSON
-    import json
-    filename = f"data_content_{page}.json"
-    filepath = os.path.join(BASE_DIR, "data", filename)
-    
-    # Buat folder data jika belum ada
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(content, f, ensure_ascii=False, indent=2)
-    
-    return jsonify({"status": "success", "message": f"Konten {page} berhasil disimpan"})
-
-# ==========================================
-# PREPROCESSING & API PREDICT
+# API PREDICT
 # ==========================================
 def preprocess_text(text):
     text = text.lower()
@@ -198,28 +176,33 @@ def not_found(error):
     return render_template("404.html"), 404
 
 # ==========================================
-# AUTO OPEN BROWSER
-# ==========================================
-def open_browser():
-    webbrowser.open("http://127.0.0.1:5000")
-
-# ==========================================
-# RUN
+# RUN - DIPERBAIKI UNTUK PRODUCTION
 # ==========================================
 if __name__ == "__main__":
+    # Mendapatkan port dari environment variable (untuk production)
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    
     print("=" * 50)
     print("FinSense SVM Running")
-    print("http://127.0.0.1:5000")
-    print("Admin Login: http://127.0.0.1:5000/admin-login")
-    print("Username: admin | Password: admin123")
+    print(f"http://0.0.0.0:{port}")
+    print("Admin Login: /admin-login")
     print("=" * 50)
     
-    threading.Timer(1.5, open_browser).start()
+    # Hanya jalankan browser di development
+    if debug:
+        import threading
+        import webbrowser
+        def open_browser():
+            webbrowser.open(f"http://127.0.0.1:{port}")
+        threading.Timer(1.5, open_browser).start()
     
+    # Gunakan socketio.run untuk development, tapi untuk production
+    # sebaiknya gunakan gunicorn
     socketio.run(
         app,
         host="0.0.0.0",
-        port=5000,
-        debug=True,
-        use_reloader=False
+        port=port,
+        debug=debug,
+        use_reloader=debug
     )
