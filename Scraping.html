@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FinSense SVM · Analisis Sentimen Keuangan</title>
+
+<!-- Bootstrap + Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #ede8df;
+    color: #2a2a26;
+}
+
+:root {
+    --bg: #ede8df;
+    --card: #fefcf8;
+    --text: #2a2a26;
+    --text-muted: #79756b;
+    --border: #dad3c7;
+    --accent: #2d5a4a;
+    --accent-light: #e8f0ec;
+    --gold: #c9a03d;
+    --gold-light: #f5efdf;
+    --clay: #b8734a;
+}
+
+body.dark {
+    --bg: #1e1e1b;
+    --card: #2a2a26;
+    --text: #e8e4db;
+    --text-muted: #9e9a8f;
+    --border: #3d3a34;
+    --accent: #5a8a78;
+    --accent-light: #2d3d35;
+    --gold: #dbb44b;
+    --gold-light: #3a3528;
+    --clay: #c88158;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+}
+
+.navbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.navbar .container {
+    max-width: 1100px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: background 0.3s;
+}
+
+.logo i {
+    font-size: 1.3rem;
+    color: white;
+}
+
+.logo::after {
+    content: "₿";
+    position: absolute;
+    font-size: 0.5rem;
+    bottom: 4px;
+    right: 6px;
+    color: rgba(255,255,200,0.9);
+    font-weight: bold;
+}
+
+.nav-brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+    transition: color 0.3s;
+}
+
+.nav-brand-text h1 span {
+    color: var(--gold);
+    font-weight: 800;
+}
+
+.nav-brand-text p {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.nav-btn:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+    color: var(--text);
+}
+
+.nav-btn.active {
+    background: var(--gold-light);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.dark-btn {
+    background: var(--gold-light);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dark-btn:hover {
+    transform: translateY(-1px) scale(1.05);
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, var(--gold), var(--accent));
+    color: white;
+    border: none;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.admin-btn i {
+    font-size: 0.75rem;
+}
+
+.admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #e0b04b, #1e4a3a);
+}
+
+.logout-btn-nav {
+    background: rgba(184, 115, 74, 0.15);
+    color: var(--clay);
+    border: 1px solid var(--clay);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: none;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.logout-btn-nav:hover {
+    background: var(--clay);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.logout-btn-nav.show {
+    display: inline-flex;
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--accent) 0%, #1e4a3a 100%);
+    padding: 1.8rem 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+}
+
+.hero::before {
+    content: "📈 ₿ 💰";
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    font-size: 2rem;
+    opacity: 0.06;
+    pointer-events: none;
+}
+
+.hero h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .hero h2 {
+        font-size: 1.5rem;
+    }
+}
+
+.hero-badge {
+    background: rgba(255,255,245,0.12);
+    border-radius: 20px;
+    padding: 0.15rem 0.7rem;
+    font-size: 0.6rem;
+    color: white;
+    display: inline-block;
+}
+
+.page-content {
+    display: none !important;
+}
+
+.page-content.active {
+    display: block !important;
+}
+
+.main-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.8rem;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold);
+}
+
+.metric-number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.metric-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+    .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.card-custom {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+}
+
+.dataset-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.7rem;
+}
+
+.dataset-label {
+    color: var(--text-muted);
+}
+
+.dataset-value {
+    font-weight: 500;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.timeline-num {
+    width: 22px;
+    height: 22px;
+    background: var(--accent-light);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.timeline-step {
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.timeline-desc {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .two-columns {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.bar-container {
+    background: var(--accent-light);
+    border-radius: 30px;
+    overflow: hidden;
+    display: flex;
+    height: 1.8rem;
+    margin: 0.5rem 0;
+}
+
+.bar-neg {
+    background: #b8734a;
+    width: 71.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+.bar-net {
+    background: #9e9580;
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+.bar-pos {
+    background: #588072;
+    width: 13.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+body.dark .bar-neg { background: #c27e55; }
+body.dark .bar-net { background: #8a8170; }
+body.dark .bar-pos { background: #4a7a6a; }
+
+.conclusion-box {
+    background: var(--accent-light);
+    padding: 0.8rem;
+    border-radius: 10px;
+    margin: 0.8rem 0;
+    transition: background 0.3s;
+}
+
+.conclusion-box p {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+}
+
+.conclusion-box ul {
+    margin: 0.3rem 0;
+    padding-left: 1.2rem;
+}
+
+.conclusion-box li {
+    font-size: 0.7rem;
+    margin-bottom: 0.2rem;
+}
+
+.code-box {
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 0.7rem;
+    font-family: monospace;
+    font-size: 0.6rem;
+    overflow-x: auto;
+    margin-top: 0.5rem;
+    transition: background 0.3s;
+    white-space: pre-wrap;
+}
+
+.scraping-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .scraping-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+.model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .model-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.visual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .visual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bar-chart {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    justify-content: center;
+}
+
+.bar-chart-item {
+    text-align: center;
+}
+
+.bar-chart-bar {
+    width: 60px;
+    border-radius: 4px 4px 0 0;
+}
+
+.bar-chart-label {
+    font-size: 0.6rem;
+    margin-top: 0.3rem;
+}
+
+.toast-notif {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--accent);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.toast-notif.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.footer {
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    padding: 1rem;
+    margin-top: 1.5rem;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.footer .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+}
+
+.footer .container span {
+    font-weight: 500;
+    color: var(--accent);
+}
+
+@media (max-width: 576px) {
+    .nav-links {
+        gap: 0.1rem;
+    }
+    .nav-btn {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.5rem;
+    }
+    .admin-btn {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.6rem;
+        margin-left: 0.2rem;
+    }
+    .dark-btn {
+        width: 26px;
+        height: 26px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <div class="logo">
+                <i class="bi bi-calculator-fill"></i>
+            </div>
+            <div class="nav-brand-text">
+                <h1>Fin<span>Sense</span> SVM</h1>
+                <p>financial sentiment · support vector machine</p>
+            </div>
+        </div>
+        <div class="nav-links">
+            <!-- TANPA href AGAR TIDAK ADA PERPINDAHAN HALAMAN -->
+            <button class="nav-btn active" data-page="beranda">Beranda</button>
+            <button class="nav-btn" data-page="scraping">Scraping</button>
+            <button class="nav-btn" data-page="model">Model</button>
+            <button class="nav-btn" data-page="visual">Visual</button>
+            
+            <button class="admin-btn" id="adminBtn">
+                <i class="bi bi-shield-lock-fill"></i> Admin
+            </button>
+            
+            <button class="logout-btn-nav" id="logoutBtnNav">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+            
+            <button class="nav-btn dark-btn" id="darkModeToggle">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex gap-2 mb-2 flex-wrap">
+                    <span class="hero-badge">SVM Linear</span>
+                    <span class="hero-badge">Twitter/X</span>
+                    <span class="hero-badge">Sep-Nov 2025</span>
+                    <span class="hero-badge">Menteri Keuangan</span>
+                </div>
+                <h2 id="heroTitle">Analisis Sentimen Pengguna X terhadap Menteri Keuangan Purbaya Yudhi Sadewa menggunakan Support Vector Machine</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- PAGE 1: BERANDA -->
+    <div class="page-content active" id="page-beranda">
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-number">91,68%</div>
+                <div class="metric-label">Akurasi</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">92,17%</div>
+                <div class="metric-label">Presisi</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">91,68%</div>
+                <div class="metric-label">Recall</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">91,64%</div>
+                <div class="metric-label">F1-Score</div>
+            </div>
+        </div>
+
+        <div class="two-columns">
+            <div>
+                <div class="card-custom">
+                    <div class="card-title">Profil Dataset</div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Scraping awal</span>
+                        <span class="dataset-value">5.000 tweet</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Data bersih (final)</span>
+                        <span class="dataset-value">4.210</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Data latih (train)</span>
+                        <span class="dataset-value">2.404</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Data uji (test)</span>
+                        <span class="dataset-value">1.806</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Fitur TF-IDF</span>
+                        <span class="dataset-value">3.284</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Periode</span>
+                        <span class="dataset-value">September - November 2025</span>
+                    </div>
+                </div>
+
+                <div class="card-custom" style="margin-top: 1rem;">
+                    <div class="card-title">Alur Pengerjaan SVM</div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-num">1</div>
+                            <div>
+                                <div class="timeline-step">Pengumpulan Data</div>
+                                <div class="timeline-desc">Scraping Twitter/X · 5.000 tweet</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">2</div>
+                            <div>
+                                <div class="timeline-step">Preprocessing</div>
+                                <div class="timeline-desc">Cleaning, case folding, stopword, stemming → 4.210 data</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">3</div>
+                            <div>
+                                <div class="timeline-step">Pelabelan Sentimen</div>
+                                <div class="timeline-desc">Positif / Netral / Negatif</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">4</div>
+                            <div>
+                                <div class="timeline-step">Penyeimbangan Data</div>
+                                <div class="timeline-desc">SMOTE / Random sampling</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">5</div>
+                            <div>
+                                <div class="timeline-step">Ekstraksi Fitur</div>
+                                <div class="timeline-desc">TF-IDF · 3.284 fitur · ngram 1-2</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">6</div>
+                            <div>
+                                <div class="timeline-step">K-Fold Cross Validation</div>
+                                <div class="timeline-desc">5-Fold · Data latih 2.404 · Data uji 1.806</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">7</div>
+                            <div>
+                                <div class="timeline-step">Training SVM</div>
+                                <div class="timeline-desc">LinearSVC · C=1.0 · loss=squared_hinge</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">8</div>
+                            <div>
+                                <div class="timeline-step">Evaluasi Model</div>
+                                <div class="timeline-desc">Akurasi 91,68% · F1 91,64%</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">9</div>
+                            <div>
+                                <div class="timeline-step">Visualisasi</div>
+                                <div class="timeline-desc">Grafik · Wordcloud · Confusion Matrix</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card-custom">
+                    <div class="card-title">Kesimpulan Penelitian</div>
+                    
+                    <div class="conclusion-box">
+                        <p><strong>1. Performa Model SVM</strong><br>
+                        Model Support Vector Machine (LinearSVC) + TF-IDF mencapai hasil:</p>
+                        <ul>
+                            <li>Akurasi : <strong>91,68%</strong></li>
+                            <li>Presisi : <strong>92,17%</strong></li>
+                            <li>Recall : <strong>91,68%</strong></li>
+                            <li>F1-Score : <strong>91,64%</strong></li>
+                        </ul>
+                        <p>Dikonfirmasi dengan <strong>5-fold cross validation</strong>.</p>
+                    </div>
+
+                    <div class="conclusion-box">
+                        <p><strong>2. Distribusi Sentimen</strong><br>
+                        Dari total 4.210 data bersih:</p>
+                        <div class="bar-container">
+                            <div class="bar-neg">Negatif 71,5% · 3.010</div>
+                            <div class="bar-net">Netral 15% · 630</div>
+                            <div class="bar-pos">Positif 13,5% · 570</div>
+                        </div>
+                        <p>Mayoritas pengguna X memberikan opini <strong>negatif</strong> terhadap Menteri Keuangan Purbaya Yudhi Sadewa.</p>
+                    </div>
+
+                    <div class="conclusion-box">
+                        <p><strong>3. Kesimpulan Akhir</strong><br>
+                        Metode <strong>Support Vector Machine (SVM) dengan kernel linear</strong> terbukti efektif untuk klasifikasi sentimen tiga kelas pada teks pendek berbahasa Indonesia. Selama periode September–November 2025, publik cenderung memberikan sentimen <strong>negatif</strong> terhadap Menteri Keuangan Purbaya Yudhi Sadewa.</p>
+                    </div>
+                </div>
+
+                <div class="card-custom" style="margin-top: 1rem;">
+                    <div class="card-title">Model Tersimpan</div>
+                    <div class="code-box">
+📁 models/svm_model_20260607_161021.joblib
+📁 models/tfidf_vectorizer_20260607_161021.joblib
+📁 models/model_metadata_20260607_161021.json
+                    </div>
+                    <div class="code-box">
+# Contoh penggunaan
+import joblib
+model = joblib.load('svm_model_20260607_161021.joblib')
+vec = joblib.load('tfidf_vectorizer_20260607_161021.joblib')
+
+teks = "Kinerja Purbaya sangat baik"
+hasil = model.predict(vec.transform([teks]))
+print(f"Sentimen: {hasil[0]}")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: SCRAPING -->
+    <div class="page-content" id="page-scraping">
+        <div class="card-custom">
+            <div class="card-title">📊 Proses Scraping Data Twitter/X</div>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Proses pengumpulan data tweet terkait Menteri Keuangan Purbaya Yudhi Sadewa</p>
+            
+            <div class="scraping-info">
+                <div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Keyword</span>
+                        <span class="dataset-value">"Purbaya" OR "Menteri Keuangan"</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Periode</span>
+                        <span class="dataset-value">September - November 2025</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Total tweet terkumpul</span>
+                        <span class="dataset-value">5.000</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Setelah preprocessing</span>
+                        <span class="dataset-value">4.210</span>
+                    </div>
+                    <div class="dataset-row">
+                        <span class="dataset-label">Bahasa</span>
+                        <span class="dataset-value">Indonesia</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-custom" style="border:1px solid var(--border);">
+                        <div class="card-title" style="font-size:0.75rem;">Tahapan Scraping</div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">1</div>
+                            <div>
+                                <div class="timeline-step">Setup API Twitter/X</div>
+                                <div class="timeline-desc">Menggunakan snscrape / tweepy</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">2</div>
+                            <div>
+                                <div class="timeline-step">Pengumpulan Data</div>
+                                <div class="timeline-desc">Scraping berdasarkan keyword</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">3</div>
+                            <div>
+                                <div class="timeline-step">Filtering & Cleaning</div>
+                                <div class="timeline-desc">Hapus duplikat, retweet, link</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-num">4</div>
+                            <div>
+                                <div class="timeline-step">Export Dataset</div>
+                                <div class="timeline-desc">CSV untuk labeling</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-box" style="margin-top:1rem;">
+📄 Sample tweet yang terkumpul:
+
+"Purbaya Yudhi Sadewa resmi dilantik sebagai Menteri Keuangan. Semoga membawa perubahan baik untuk ekonomi Indonesia. #Purbaya"
+"Kinerja Purbaya sebagai Menkeu masih biasa aja sih, belum ada gebrakan berarti. 🤔"
+"Pemerintah perlu evaluasi kinerja Menteri Keuangan Purbaya, banyak program yang tidak berjalan maksimal."
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: MODEL -->
+    <div class="page-content" id="page-model">
+        <div class="card-custom">
+            <div class="card-title">🧠 Detail Model SVM</div>
+            
+            <div class="model-grid">
+                <div>
+                    <div class="card-custom" style="border:1px solid var(--border);">
+                        <div class="card-title" style="font-size:0.75rem;">Parameter Model</div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Algoritma</span>
+                            <span class="dataset-value">LinearSVC</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Kernel</span>
+                            <span class="dataset-value">Linear</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">C (Regularization)</span>
+                            <span class="dataset-value">1.0</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Loss</span>
+                            <span class="dataset-value">squared_hinge</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Max Iter</span>
+                            <span class="dataset-value">1000</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Random State</span>
+                            <span class="dataset-value">42</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-custom" style="border:1px solid var(--border);">
+                        <div class="card-title" style="font-size:0.75rem;">Hasil Evaluasi</div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Akurasi</span>
+                            <span class="dataset-value" style="color:var(--accent);font-weight:700;">91,68%</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Presisi (macro)</span>
+                            <span class="dataset-value" style="color:var(--accent);font-weight:700;">92,17%</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Recall (macro)</span>
+                            <span class="dataset-value" style="color:var(--accent);font-weight:700;">91,68%</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">F1-Score (macro)</span>
+                            <span class="dataset-value" style="color:var(--accent);font-weight:700;">91,64%</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Cross Validation</span>
+                            <span class="dataset-value">5-Fold</span>
+                        </div>
+                        <div class="dataset-row">
+                            <span class="dataset-label">Rata-rata CV</span>
+                            <span class="dataset-value">91,2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:1rem;">
+                <div class="card-title" style="font-size:0.8rem;">Confusion Matrix</div>
+                <div class="code-box" style="font-size:0.7rem;">
+                            Prediksi
+                    Aktual   Negatif  Netral  Positif
+                    Negatif    1.285      45       32
+                    Netral        58     185       27
+                    Positif       27      23      124
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: VISUAL -->
+    <div class="page-content" id="page-visual">
+        <div class="card-custom">
+            <div class="card-title">📈 Visualisasi Data</div>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Grafik dan visualisasi dari hasil analisis sentimen</p>
+            
+            <div class="visual-grid">
+                <div class="card-custom" style="border:1px solid var(--border);">
+                    <div class="card-title" style="font-size:0.75rem;">Distribusi Sentimen</div>
+                    <div class="bar-chart">
+                        <div class="bar-chart-item">
+                            <div class="bar-chart-bar" style="background:#b8734a; height:143px;"></div>
+                            <div class="bar-chart-label">Negatif 71,5%</div>
+                        </div>
+                        <div class="bar-chart-item">
+                            <div class="bar-chart-bar" style="background:#9e9580; height:30px;"></div>
+                            <div class="bar-chart-label">Netral 15%</div>
+                        </div>
+                        <div class="bar-chart-item">
+                            <div class="bar-chart-bar" style="background:#588072; height:27px;"></div>
+                            <div class="bar-chart-label">Positif 13,5%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-custom" style="border:1px solid var(--border);">
+                    <div class="card-title" style="font-size:0.75rem;">Performa Model</div>
+                    <div style="padding:0.5rem 0;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.3rem;">
+                            <span style="font-size:0.6rem; width:60px;">Akurasi</span>
+                            <div style="flex:1; background:var(--accent-light); height:16px; border-radius:10px; overflow:hidden;">
+                                <div style="background:var(--accent); width:91.68%; height:100%; border-radius:10px;"></div>
+                            </div>
+                            <span style="font-size:0.6rem; font-weight:600;">91,68%</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.3rem;">
+                            <span style="font-size:0.6rem; width:60px;">Presisi</span>
+                            <div style="flex:1; background:var(--accent-light); height:16px; border-radius:10px; overflow:hidden;">
+                                <div style="background:var(--gold); width:92.17%; height:100%; border-radius:10px;"></div>
+                            </div>
+                            <span style="font-size:0.6rem; font-weight:600;">92,17%</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.3rem;">
+                            <span style="font-size:0.6rem; width:60px;">Recall</span>
+                            <div style="flex:1; background:var(--accent-light); height:16px; border-radius:10px; overflow:hidden;">
+                                <div style="background:#b8734a; width:91.68%; height:100%; border-radius:10px;"></div>
+                            </div>
+                            <span style="font-size:0.6rem; font-weight:600;">91,68%</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="font-size:0.6rem; width:60px;">F1-Score</span>
+                            <div style="flex:1; background:var(--accent-light); height:16px; border-radius:10px; overflow:hidden;">
+                                <div style="background:var(--clay); width:91.64%; height:100%; border-radius:10px;"></div>
+                            </div>
+                            <span style="font-size:0.6rem; font-weight:600;">91,64%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:1rem;">
+                <div class="card-custom" style="border:1px solid var(--border);">
+                    <div class="card-title" style="font-size:0.75rem;">Wordcloud - Kata Paling Sering Muncul</div>
+                    <div style="padding:0.5rem; text-align:center; font-size:0.7rem; line-height:2;">
+                        <span style="font-size:1.4rem; font-weight:700; color:var(--clay);">purbaya</span>
+                        <span style="font-size:1.2rem; font-weight:600; color:var(--accent);">menteri</span>
+                        <span style="font-size:1.1rem; font-weight:600; color:var(--gold);">keuangan</span>
+                        <span style="font-size:1.0rem; color:var(--text-muted);">kinerja</span>
+                        <span style="font-size:0.9rem; color:var(--text-muted);">ekonomi</span>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">kebijakan</span>
+                        <span style="font-size:0.7rem; color:var(--text-muted);">inflasi</span>
+                        <span style="font-size:0.6rem; color:var(--text-muted);">pemerintah</span>
+                        <span style="font-size:0.5rem; color:var(--text-muted);">anggaran</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        Dibuat oleh <span>M. Rifqi Arista Aprilianto</span> · FinSense SVM · 2026
+    </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast-notif" id="toastNotif">
+    <i class="bi bi-check-circle"></i> <span id="toastMsg">Selamat datang!</span>
+</div>
+
+<script>
+// ================================================================
+// 1. NAVIGASI MULTI PAGE - TANPA HASH/ANCHOR
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Ambil semua tombol navigasi
+    const navButtons = document.querySelectorAll('.nav-btn[data-page]');
+    
+    // Map page ID ke element
+    const pages = {
+        beranda: document.getElementById('page-beranda'),
+        scraping: document.getElementById('page-scraping'),
+        model: document.getElementById('page-model'),
+        visual: document.getElementById('page-visual')
+    };
+
+    // Fungsi untuk menampilkan page tertentu
+    function showPage(pageId) {
+        // Sembunyikan semua page
+        Object.values(pages).forEach(p => {
+            if (p) p.classList.remove('active');
+        });
+        
+        // Tampilkan page yang dipilih
+        if (pages[pageId]) {
+            pages[pageId].classList.add('active');
+        }
+        
+        // Update active class pada tombol navigasi
+        navButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.page === pageId) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Simpan state di localStorage agar bisa diingat saat refresh
+        try {
+            localStorage.setItem('finsense_current_page', pageId);
+        } catch(e) {}
+    }
+
+    // Event listener untuk setiap tombol navigasi
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const pageId = this.dataset.page;
+            if (pageId) {
+                showPage(pageId);
+            }
+        });
+    });
+
+    // Load page terakhir yang disimpan atau default beranda
+    let defaultPage = 'beranda';
+    try {
+        const savedPage = localStorage.getItem('finsense_current_page');
+        if (savedPage && pages[savedPage]) {
+            defaultPage = savedPage;
+        }
+    } catch(e) {}
+    
+    showPage(defaultPage);
+});
+
+// ================================================================
+// 2. DARK MODE
+// ================================================================
+const toggleBtn = document.getElementById('darkModeToggle');
+const icon = toggleBtn.querySelector('i');
+
+if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark');
+    icon.classList.remove('bi-moon-stars');
+    icon.classList.add('bi-sun');
+}
+
+toggleBtn.addEventListener('click', function() {
+    document.body.classList.toggle('dark');
+    if (document.body.classList.contains('dark')) {
+        localStorage.setItem('darkMode', 'enabled');
+        icon.classList.remove('bi-moon-stars');
+        icon.classList.add('bi-sun');
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+        icon.classList.remove('bi-sun');
+        icon.classList.add('bi-moon-stars');
+    }
+});
+
+// ================================================================
+// 3. ADMIN LOGIN
+// ================================================================
+function updateAdminUI() {
+    const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+    const adminBtn = document.getElementById('adminBtn');
+    const logoutBtn = document.getElementById('logoutBtnNav');
+    
+    if (isLoggedIn) {
+        const username = sessionStorage.getItem('admin_username') || 'Admin';
+        adminBtn.innerHTML = `<i class="bi bi-shield-lock-fill"></i> ${username}`;
+        adminBtn.style.background = 'linear-gradient(135deg, #2d6a4f, var(--accent))';
+        logoutBtn.classList.add('show');
+    } else {
+        adminBtn.innerHTML = `<i class="bi bi-shield-lock-fill"></i> Admin`;
+        adminBtn.style.background = 'linear-gradient(135deg, var(--gold), var(--accent))';
+        logoutBtn.classList.remove('show');
+    }
+}
+
+document.getElementById('adminBtn').addEventListener('click', function() {
+    const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+    
+    if (isLoggedIn) {
+        showToast('Anda sudah login sebagai ' + sessionStorage.getItem('admin_username'));
+        return;
+    }
+    
+    const username = prompt('Masukkan username admin:');
+    if (username === null) return;
+    
+    const password = prompt('Masukkan password:');
+    if (password === null) return;
+    
+    if (username === 'admin' && password === 'admin123') {
+        sessionStorage.setItem('admin_logged_in', 'true');
+        sessionStorage.setItem('admin_username', username);
+        sessionStorage.setItem('admin_login_time', new Date().toISOString());
+        updateAdminUI();
+        showToast('Login berhasil! Selamat datang ' + username);
+    } else {
+        showToast('Username atau password salah!');
+    }
+});
+
+document.getElementById('logoutBtnNav').addEventListener('click', function() {
+    if (confirm('Apakah Anda yakin ingin logout?')) {
+        sessionStorage.removeItem('admin_logged_in');
+        sessionStorage.removeItem('admin_username');
+        sessionStorage.removeItem('admin_login_time');
+        updateAdminUI();
+        showToast('Berhasil logout!');
+    }
+});
+
+function showToast(msg) {
+    const toast = document.getElementById('toastNotif');
+    const toastMsg = document.getElementById('toastMsg');
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ================================================================
+// 4. INISIALISASI
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminUI();
+    if (sessionStorage.getItem('admin_logged_in') === 'true') {
+        showToast('Selamat datang, ' + sessionStorage.getItem('admin_username') + '!');
+    }
+    console.log('🏦 FinSense SVM - Halaman Beranda (Static)');
+});
+
+// Cek login secara periodik
+setInterval(updateAdminUI, 5000);
+</script>
+</body>
+</html>
