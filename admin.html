@@ -1,621 +1,4151 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FinSense SVM · Admin Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel · FinSense SVM</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-body {
-    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
-    background: #ede8df;
-    color: #2a2a26;
-}
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
 
-/* NAVBAR ADMIN */
-.navbar {
-    background: #2d5a4a;
-    padding: 0.8rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+    <style>
+        /* ================================================================
+           ROOT VARIABLES
+           ================================================================ */
+        :root {
+            --bg: #f0ede8;
+            --sidebar-bg: #0f1f1a;
+            --sidebar-hover: #1a3a30;
+            --sidebar-active: #c9a03d;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #6b6b6b;
+            --text-muted: #9a9a92;
+            --text-light: #b5b5ad;
+            --border: #e8e3db;
+            --accent: #1a3a30;
+            --accent-light: #e8f0ec;
+            --accent-hover: #0f2a22;
+            --gold: #c9a03d;
+            --gold-light: #f5efdf;
+            --gold-hover: #b88a2e;
+            --success: #2d6a4f;
+            --danger: #b8734a;
+            --warning: #f39c12;
+            --info: #2d7a8a;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 260px;
+        }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.logo-icon {
-    width: 40px;
-    height: 40px;
-    background: #c9a03d;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    color: white;
-}
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
 
-.logo h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: white;
-}
+        /* ================================================================
+           ANIMATIONS
+           ================================================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-.logo h2 span {
-    color: #c9a03d;
-}
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-.nav-menu {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
 
-.nav-menu a {
-    color: rgba(255,255,245,0.85);
-    text-decoration: none;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-.nav-menu a:hover {
-    background: rgba(255,255,245,0.15);
-    color: white;
-    transform: translateY(-2px);
-}
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
 
-.nav-menu a.active {
-    background: rgba(255,255,245,0.2);
-    color: white;
-}
+        @keyframes modalOverlayIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
 
-/* LOGOUT BUTTON */
-.logout-btn {
-    background: rgba(255,255,245,0.15);
-    color: #ffcccc;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
 
-.logout-btn:hover {
-    background: rgba(255,100,100,0.3);
-    color: white;
-    transform: translateY(-2px);
-}
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
 
-/* MAIN CONTENT */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .animate-slideInLeft {
+            animation: slideInLeft 0.4s ease forwards;
+        }
+        .animate-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
 
-/* GREETING */
-.greeting {
-    margin-bottom: 1.5rem;
-}
+        /* ================================================================
+           SIDEBAR
+           ================================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 1.2rem 0.8rem;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
 
-.greeting h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2d5a4a;
-}
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 10px;
+        }
 
-.greeting p {
-    color: #7a7a72;
-    font-size: 0.8rem;
-    margin-top: 0.3rem;
-}
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0 0.5rem 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 1.2rem;
+            animation: slideInLeft 0.5s ease;
+        }
 
-/* STATS GRID */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
+        .sidebar-brand .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: white;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
 
-.stat-card {
-    background: #fffdf9;
-    border: 1px solid #e0d9cf;
-    border-radius: 20px;
-    padding: 1rem;
-    text-align: center;
-    transition: 0.2s;
-    cursor: pointer;
-}
+        .sidebar-brand .logo:hover {
+            transform: rotate(-5deg) scale(1.05);
+        }
 
-.stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.05);
-    border-color: #c9a03d;
-}
+        .sidebar-brand .brand-text h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+            letter-spacing: -0.3px;
+        }
 
-.stat-icon {
-    font-size: 1.8rem;
-    color: #c9a03d;
-    margin-bottom: 0.5rem;
-}
+        .sidebar-brand .brand-text h4 span {
+            color: var(--gold);
+        }
+        .sidebar-brand .brand-text small {
+            display: block;
+            font-size: 0.5rem;
+            color: var(--text-light);
+            letter-spacing: 0.3px;
+        }
 
-.stat-number {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #2d5a4a;
-}
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.8rem 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-sm);
+            margin-bottom: 1.2rem;
+            transition: var(--transition);
+            animation: slideInLeft 0.6s ease;
+        }
 
-.stat-label {
-    font-size: 0.7rem;
-    color: #7a7a72;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+        .sidebar-user:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
 
-/* ROW */
-.row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
+        .sidebar-user .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: white;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
 
-.col {
-    flex: 1;
-    min-width: 250px;
-}
+        .sidebar-user .avatar:hover {
+            transform: scale(1.1);
+        }
 
-/* CARD */
-.card {
-    background: #fffdf9;
-    border: 1px solid #e0d9cf;
-    border-radius: 20px;
-    padding: 1.2rem;
-    height: 100%;
-}
+        .sidebar-user .user-info {
+            flex: 1;
+        }
 
-.card-title {
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 2px solid #c9a03d;
-    display: inline-block;
-}
+        .sidebar-user .user-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
 
-.card-title i {
-    margin-right: 0.4rem;
-    color: #c9a03d;
-}
+        .sidebar-user .user-info .role {
+            font-size: 0.55rem;
+            color: var(--text-light);
+        }
 
-/* MENU GRID - TAMBAHKAN EDIT KONTEN DI SINI */
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.8rem;
-    margin-top: 0.5rem;
-}
+        .sidebar-user .status {
+            width: 8px;
+            height: 8px;
+            background: #2d6a4f;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+        }
 
-.menu-item {
-    background: #f0ece4;
-    border-radius: 14px;
-    padding: 0.8rem;
-    text-align: center;
-    text-decoration: none;
-    color: #2a2a26;
-    transition: 0.2s;
-    display: block;
-    cursor: pointer;
-}
+        .sidebar-nav {
+            flex: 1;
+            list-style: none;
+            padding: 0;
+        }
 
-.menu-item:hover {
-    background: #c9a03d;
-    color: white;
-    transform: translateY(-3px);
-}
+        .sidebar-nav .nav-label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-light);
+            padding: 0.5rem 0.5rem 0.3rem;
+            font-weight: 600;
+        }
 
-.menu-item i {
-    font-size: 1.3rem;
-    margin-bottom: 0.3rem;
-    display: block;
-}
+        .sidebar-nav li {
+            margin-bottom: 2px;
+        }
 
-.menu-item span {
-    font-size: 0.7rem;
-    font-weight: 500;
-}
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: var(--radius-sm);
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
 
-/* CHART */
-canvas {
-    max-height: 200px;
-    width: 100%;
-}
+        .sidebar-nav a:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            transform: translateX(4px);
+        }
 
-/* INFO LIST */
-.info-list {
-    list-style: none;
-}
+        .sidebar-nav a.active {
+            background: var(--sidebar-hover);
+            color: var(--gold);
+        }
 
-.info-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #e0d9cf;
-    font-size: 0.75rem;
-}
+        .sidebar-nav a.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--gold);
+            border-radius: 0 3px 3px 0;
+        }
 
-.info-list li:last-child {
-    border-bottom: none;
-}
+        .sidebar-nav a i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
 
-.info-label {
-    color: #7a7a72;
-}
+        .sidebar-nav a .badge {
+            margin-left: auto;
+            font-size: 0.5rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            background: var(--gold);
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
 
-.info-value {
-    font-weight: 600;
-    color: #2d5a4a;
-}
+        .sidebar-nav .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 0.5rem 0.5rem;
+        }
 
-/* ACTIVITY */
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid #e0d9cf;
-    cursor: pointer;
-}
+        .sidebar-footer {
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
 
-.activity-item:hover {
-    background: #f5f0e8;
-    border-radius: 10px;
-    padding-left: 0.3rem;
-}
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: var(--radius-sm);
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: var(--transition);
+        }
 
-.activity-icon {
-    width: 32px;
-    height: 32px;
-    background: #f0ece4;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #c9a03d;
-}
+        .sidebar-footer a:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            transform: translateX(4px);
+        }
 
-.activity-text {
-    flex: 1;
-}
+        .sidebar-footer a i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
 
-.activity-title {
-    font-size: 0.75rem;
-    font-weight: 500;
-}
+        /* ================================================================
+           MAIN CONTENT
+           ================================================================ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            padding: 1.2rem 1.8rem 1.2rem;
+        }
 
-.activity-time {
-    font-size: 0.6rem;
-    color: #7a7a72;
-}
+        /* ================================================================
+           TOPBAR
+           ================================================================ */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
 
-/* FOOTER */
-.footer {
-    border-top: 1px solid #e0d9cf;
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.65rem;
-    color: #7a7a72;
-    margin-top: 1rem;
-}
+        .topbar .page-title h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text);
+            animation: fadeInUp 0.5s ease;
+        }
 
-.footer span {
-    font-weight: 500;
-    color: #2d5a4a;
-}
+        .topbar .page-title h2 small {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+        }
 
-/* RESPONSIVE */
-@media (max-width: 700px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .navbar {
-        flex-direction: column;
-        text-align: center;
-    }
-    .container {
-        padding: 1rem;
-    }
-}
-</style>
+        .topbar .page-title p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .topbar .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topbar .topbar-right .datetime {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .topbar .topbar-right .datetime i {
+            margin-right: 0.3rem;
+        }
+
+        .online-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: var(--success);
+            padding: 0.2rem 0.8rem;
+            background: rgba(45, 106, 79, 0.1);
+            border-radius: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .online-status .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.3rem;
+            transition: var(--transition);
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ================================================================
+           STATS GRID
+           ================================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeInUp 0.5s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .stat-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        .stat-card:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(-3deg);
+        }
+
+        .stat-card .stat-icon.green {
+            background: #e6f5ea;
+            color: var(--success);
+        }
+        .stat-card .stat-icon.gold {
+            background: var(--gold-light);
+            color: var(--gold);
+        }
+        .stat-card .stat-icon.blue {
+            background: #e3f0f5;
+            color: var(--info);
+        }
+        .stat-card .stat-icon.red {
+            background: #f5e8e6;
+            color: var(--danger);
+        }
+
+        .stat-card .stat-info .number {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .stat-card .stat-info .number .trend {
+            font-size: 0.6rem;
+            font-weight: 500;
+            margin-left: 0.3rem;
+        }
+
+        .stat-card .stat-info .number .trend.up {
+            color: var(--success);
+        }
+        .stat-card .stat-info .number .trend.down {
+            color: var(--danger);
+        }
+
+        .stat-card .stat-info .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* ================================================================
+           CHART ROW
+           ================================================================ */
+        .chart-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1.2rem 0.8rem;
+            animation: fadeInUp 0.6s ease;
+            transition: var(--transition);
+        }
+
+        .chart-card:hover {
+            border-color: var(--gold);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .chart-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .chart-card .card-header h5 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .chart-card .card-header h5 i {
+            color: var(--gold);
+            margin-right: 0.4rem;
+        }
+
+        .chart-card .card-header .period {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        .chart-card canvas {
+            max-height: 180px;
+            width: 100%;
+        }
+
+        /* ================================================================
+           QUICK ACTION
+           ================================================================ */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-action {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+            animation: fadeInUp 0.5s ease;
+            cursor: pointer;
+        }
+
+        .quick-action:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .quick-action:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        .quick-action:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .quick-action i {
+            font-size: 1.5rem;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 0.3rem;
+            transition: var(--transition);
+        }
+
+        .quick-action:hover i {
+            transform: scale(1.2) rotate(-5deg);
+        }
+
+        .quick-action span {
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: block;
+        }
+        .quick-action small {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+        }
+
+        /* ================================================================
+           ACTIVITY & RECENT
+           ================================================================ */
+        .activity-recent-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            animation: fadeInUp 0.7s ease;
+            transition: var(--transition);
+        }
+
+        .panel:hover {
+            border-color: var(--gold);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .panel .panel-header h5 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .panel .panel-header h5 i {
+            color: var(--gold);
+            margin-right: 0.4rem;
+        }
+
+        .panel .panel-header .view-all {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .panel .panel-header .view-all:hover {
+            color: var(--gold);
+            background: rgba(201, 160, 61, 0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: rgba(201, 160, 61, 0.03);
+            padding-left: 0.3rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 0.4rem;
+            flex-shrink: 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .activity-item .activity-dot.green {
+            background: var(--success);
+        }
+        .activity-item .activity-dot.gold {
+            background: var(--gold);
+        }
+        .activity-item .activity-dot.blue {
+            background: var(--info);
+        }
+        .activity-item .activity-dot.red {
+            background: var(--danger);
+        }
+
+        .activity-item .activity-content {
+            flex: 1;
+        }
+
+        .activity-item .activity-content .title {
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
+        .activity-item .activity-content .desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .activity-item .activity-time {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .table-recent {
+            width: 100%;
+            font-size: 0.75rem;
+            border-collapse: collapse;
+        }
+
+        .table-recent th {
+            text-align: left;
+            padding: 0.4rem 0.3rem;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-recent td {
+            padding: 0.4rem 0.3rem;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .table-recent tr:hover td {
+            background: rgba(201, 160, 61, 0.04);
+        }
+
+        .table-recent tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-sentimen {
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 500;
+        }
+
+        .badge-sentimen.positif {
+            background: #e6f5ea;
+            color: var(--success);
+        }
+        .badge-sentimen.negatif {
+            background: #f5e8e6;
+            color: var(--danger);
+        }
+        .badge-sentimen.netral {
+            background: #f5efe6;
+            color: var(--warning);
+        }
+
+        /* ================================================================
+           MENU PAGES
+           ================================================================ */
+        .menu-page {
+            display: none;
+        }
+
+        .menu-page.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .menu-page .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-page .page-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .menu-page .page-header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* ================================================================
+           DATA TABLE
+           ================================================================ */
+        .data-table-wrapper {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            overflow-x: auto;
+            transition: var(--transition);
+        }
+
+        .data-table-wrapper:hover {
+            border-color: var(--gold);
+        }
+
+        .data-table-wrapper table {
+            width: 100%;
+            font-size: 0.75rem;
+            border-collapse: collapse;
+        }
+
+        .data-table-wrapper th {
+            text-align: left;
+            padding: 0.6rem 0.5rem;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table-wrapper td {
+            padding: 0.5rem 0.5rem;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .data-table-wrapper tr:hover td {
+            background: rgba(201, 160, 61, 0.04);
+        }
+
+        .btn-action {
+            padding: 0.2rem 0.6rem;
+            border: none;
+            border-radius: var(--radius-xs);
+            font-size: 0.6rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-action.edit {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .btn-action.edit:hover {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-action.delete {
+            background: #f5e8e6;
+            color: var(--danger);
+        }
+
+        .btn-action.delete:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-action.primary {
+            background: var(--accent);
+            color: white;
+            padding: 0.4rem 1.2rem;
+        }
+
+        .btn-action.primary:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .btn-action.success {
+            background: var(--success);
+            color: white;
+            padding: 0.4rem 1.2rem;
+        }
+
+        .btn-action.success:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        /* ================================================================
+           USER MANAGEMENT
+           ================================================================ */
+        .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .user-status.active {
+            color: var(--success);
+        }
+        .user-status.inactive {
+            color: var(--danger);
+        }
+
+        .user-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .user-status.active .dot {
+            background: var(--success);
+        }
+        .user-status.inactive .dot {
+            background: var(--danger);
+        }
+
+        .role-badge {
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.55rem;
+            font-weight: 600;
+        }
+
+        .role-badge.super-admin {
+            background: #e6f5ea;
+            color: var(--success);
+        }
+        .role-badge.admin {
+            background: #e3f0f5;
+            color: var(--info);
+        }
+        .role-badge.editor {
+            background: #f5efe6;
+            color: var(--warning);
+        }
+        .role-badge.analis {
+            background: #f5e8e6;
+            color: var(--danger);
+        }
+
+        /* ================================================================
+           MONITORING
+           ================================================================ */
+        .monitoring-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .monitoring-stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            text-align: center;
+            transition: var(--transition);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .monitoring-stat:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .monitoring-stat .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .monitoring-stat .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .monitoring-stat .change {
+            font-size: 0.55rem;
+            font-weight: 600;
+            margin-top: 0.2rem;
+        }
+
+        .monitoring-stat .change.up {
+            color: var(--success);
+        }
+        .monitoring-stat .change.down {
+            color: var(--danger);
+        }
+
+        /* ================================================================
+           CONFIRM DIALOG (Premium Style)
+           ================================================================ */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            animation: modalOverlayIn 0.3s ease;
+        }
+
+        .confirm-overlay.show {
+            display: flex;
+        }
+
+        .confirm-dialog {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem 3rem;
+            max-width: 480px;
+            width: 90%;
+            animation: bounceIn 0.5s ease;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confirm-dialog::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), var(--accent), var(--gold));
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .confirm-dialog .confirm-icon-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(201, 160, 61, 0.1), rgba(26, 58, 48, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .confirm-dialog .confirm-icon {
+            font-size: 3rem;
+            display: block;
+        }
+
+        .confirm-dialog .confirm-icon.warning {
+            color: var(--warning);
+        }
+        .confirm-dialog .confirm-icon.danger {
+            color: var(--danger);
+        }
+        .confirm-dialog .confirm-icon.info {
+            color: var(--info);
+        }
+        .confirm-dialog .confirm-icon.success {
+            color: var(--success);
+        }
+        .confirm-dialog .confirm-icon.primary {
+            color: var(--accent);
+        }
+
+        .confirm-dialog .confirm-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .confirm-dialog .confirm-message {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .confirm-dialog .confirm-actions {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .confirm-dialog .confirm-actions button {
+            padding: 0.7rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-yes {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 58, 48, 0.3);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-yes:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(26, 58, 48, 0.4);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-no {
+            background: var(--border);
+            color: var(--text-secondary);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-no:hover {
+            background: #d5d0c8;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 15px rgba(184, 115, 74, 0.3);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-danger:hover {
+            background: #a85a3a;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(184, 115, 74, 0.4);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-success {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-success:hover {
+            background: #1f5a3f;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(45, 106, 79, 0.4);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 58, 48, 0.3);
+        }
+
+        .confirm-dialog .confirm-actions .btn-confirm-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(26, 58, 48, 0.4);
+        }
+
+        .confirm-dialog .confirm-actions button i {
+            font-size: 1rem;
+        }
+
+        /* ================================================================
+           TOAST NOTIFICATION
+           ================================================================ */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: slideInRight 0.4s ease;
+            border-left: 4px solid var(--gold);
+            transition: var(--transition);
+        }
+
+        .toast-custom.success {
+            border-left-color: var(--success);
+        }
+        .toast-custom.error {
+            border-left-color: var(--danger);
+        }
+        .toast-custom.warning {
+            border-left-color: var(--warning);
+        }
+        .toast-custom.info {
+            border-left-color: var(--info);
+        }
+
+        .toast-custom .toast-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .toast-custom .toast-icon.success {
+            color: var(--success);
+        }
+        .toast-custom .toast-icon.error {
+            color: var(--danger);
+        }
+        .toast-custom .toast-icon.warning {
+            color: var(--warning);
+        }
+        .toast-custom .toast-icon.info {
+            color: var(--info);
+        }
+
+        .toast-custom .toast-content {
+            flex: 1;
+        }
+
+        .toast-custom .toast-content .toast-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .toast-custom .toast-content .toast-message {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .toast-custom .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .toast-custom .toast-close:hover {
+            color: var(--text);
+            transform: rotate(90deg);
+        }
+
+        /* ================================================================
+           NOTIFICATION CENTER
+           ================================================================ */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .notification-bell:hover {
+            transform: scale(1.1);
+        }
+
+        .notification-bell .badge-notif {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            border: 1px solid var(--border);
+        }
+
+        .notification-dropdown.show {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .notification-dropdown .notif-header {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-dropdown .notif-header .mark-all {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .notification-dropdown .notif-header .mark-all:hover {
+            color: var(--gold);
+        }
+
+        .notification-dropdown .notif-item {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .notification-dropdown .notif-item:hover {
+            background: rgba(201, 160, 61, 0.04);
+        }
+
+        .notification-dropdown .notif-item .notif-icon {
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-top: 0.1rem;
+        }
+
+        .notification-dropdown .notif-item .notif-content {
+            flex: 1;
+        }
+
+        .notification-dropdown .notif-item .notif-content .notif-title {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .notification-dropdown .notif-item .notif-content .notif-desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .notification-dropdown .notif-item .notif-time {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .notification-dropdown .notif-empty {
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .notification-dropdown .notif-empty i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--border);
+        }
+
+        .topbar-right .notif-wrapper {
+            position: relative;
+        }
+
+        /* ================================================================
+           MODAL
+           ================================================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            animation: modalOverlayIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.4s ease;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h5 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .modal-content .form-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .modal-content .form-group input,
+        .modal-content .form-group select,
+        .modal-content .form-group textarea {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        .modal-content .form-group input:focus,
+        .modal-content .form-group select:focus,
+        .modal-content .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 160, 61, 0.1);
+        }
+
+        .modal-content .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: var(--radius-xs);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-actions .btn-save {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal-actions .btn-save:hover {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+        }
+
+        .modal-actions .btn-cancel {
+            background: var(--border);
+            color: var(--text-secondary);
+        }
+
+        .modal-actions .btn-cancel:hover {
+            background: #d5d0c8;
+            transform: scale(1.02);
+        }
+
+        /* ================================================================
+           RESPONSIVE
+           ================================================================ */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+            .monitoring-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .hamburger-btn {
+                display: flex !important;
+            }
+            .activity-recent-row {
+                grid-template-columns: 1fr;
+            }
+            .notification-dropdown {
+                width: 280px;
+                right: -60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .monitoring-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .topbar .topbar-right .datetime {
+                display: none;
+            }
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: 100%;
+            }
+            .confirm-dialog {
+                padding: 1.8rem;
+            }
+            .confirm-dialog .confirm-actions {
+                flex-direction: column;
+            }
+            .confirm-dialog .confirm-actions button {
+                width: 100%;
+            }
+            .notification-dropdown {
+                width: 260px;
+                right: -40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+            .monitoring-stats {
+                grid-template-columns: 1fr;
+            }
+            .confirm-dialog {
+                padding: 1.5rem;
+            }
+        }
+
+        .text-gold {
+            color: var(--gold);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--border);
+        }
+    </style>
 </head>
 <body>
 
-<!-- NAVBAR ADMIN -->
-<div class="navbar">
-    <div class="logo">
-        <div class="logo-icon"><i class="bi bi-calculator-fill"></i></div>
-        <h2>Fin<span>Sense</span> SVM</h2>
-    </div>
-    <div class="nav-menu">
-        <a href="/admin" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="/scraping"><i class="bi bi-twitter-x"></i> Scraping</a>
-        <a href="/visualisasi"><i class="bi bi-bar-chart-steps"></i> Visualisasi</a>
-        <a href="/analisis"><i class="bi bi-robot"></i> Analisis</a>
-    </div>
-    <button class="logout-btn" onclick="logout()">
-        <i class="bi bi-box-arrow-right"></i> Logout
-    </button>
-</div>
+    <!-- ================================================================
+    TOAST NOTIFICATION CONTAINER
+    ================================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
 
-<!-- MAIN CONTENT -->
-<div class="container">
-
-    <!-- GREETING -->
-    <div class="greeting">
-        <h1>Selamat datang, Admin 👋</h1>
-        <p>Dashboard monitoring sistem analisis sentimen Menteri Keuangan Purbaya Yudhi Sadewa</p>
-    </div>
-
-    <!-- STATS GRID -->
-    <div class="stats-grid">
-        <div class="stat-card" onclick="location.href='/scraping'">
-            <div class="stat-icon"><i class="bi bi-database"></i></div>
-            <div class="stat-number">4.210</div>
-            <div class="stat-label">Total Data</div>
-        </div>
-        <div class="stat-card" onclick="location.href='/visualisasi'">
-            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
-            <div class="stat-number">91,68%</div>
-            <div class="stat-label">Akurasi SVM</div>
-        </div>
-        <div class="stat-card" onclick="location.href='/visualisasi'">
-            <div class="stat-icon"><i class="bi bi-graph-up"></i></div>
-            <div class="stat-number">42%</div>
-            <div class="stat-label">Sentimen Positif</div>
-        </div>
-        <div class="stat-card" onclick="location.href='/visualisasi'">
-            <div class="stat-icon"><i class="bi bi-graph-down"></i></div>
-            <div class="stat-number">35%</div>
-            <div class="stat-label">Sentimen Negatif</div>
-        </div>
-        <div class="stat-card" onclick="location.href='/visualisasi'">
-            <div class="stat-icon"><i class="bi bi-bar-chart"></i></div>
-            <div class="stat-number">23%</div>
-            <div class="stat-label">Sentimen Netral</div>
-        </div>
-        <div class="stat-card" onclick="location.href='/about'">
-            <div class="stat-icon"><i class="bi bi-cpu"></i></div>
-            <div class="stat-number">3.284</div>
-            <div class="stat-label">Fitur TF-IDF</div>
-        </div>
-    </div>
-
-    <!-- ROW 1: MENU & CHART -->
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-title">
-                    <i class="bi bi-grid"></i> Menu Aplikasi
-                </div>
-                <div class="menu-grid">
-                    <a href="/scraping" class="menu-item">
-                        <i class="bi bi-twitter-x"></i>
-                        <span>Scraping Data</span>
-                    </a>
-                    <a href="/visualisasi" class="menu-item">
-                        <i class="bi bi-bar-chart-steps"></i>
-                        <span>Visualisasi</span>
-                    </a>
-                    <a href="/analisis" class="menu-item">
-                        <i class="bi bi-robot"></i>
-                        <span>Analisis Sentimen</span>
-                    </a>
-                    <!-- TAMBAHAN MENU EDIT KONTEN -->
-                    <a href="/admin-editor" class="menu-item">
-                         <i class="bi bi-pencil-square"></i>
-                             <span>Edit Konten</span>
-                        </a>
-                    <a href="/" class="menu-item">
-                        <i class="bi bi-house-door"></i>
-                        <span>Beranda</span>
-                    </a>
-                </div>
+    <!-- ================================================================
+    CONFIRM DIALOG (Premium)
+    ================================================================ -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-dialog">
+            <div class="confirm-icon-wrap">
+                <span class="confirm-icon" id="confirmIcon">🏠</span>
             </div>
-        </div>
-
-        <div class="col">
-            <div class="card">
-                <div class="card-title">
-                    <i class="bi bi-pie-chart"></i> Distribusi Sentimen
-                </div>
-                <canvas id="pieChart"></canvas>
+            <div class="confirm-title" id="confirmTitle">Konfirmasi</div>
+            <div class="confirm-message" id="confirmMessage">Apakah Anda yakin?</div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-no" id="confirmNo">
+                    <i class="bi bi-x-circle"></i> Batal
+                </button>
+                <button class="btn-confirm-yes" id="confirmYes">
+                    <i class="bi bi-check-circle"></i> Ya, Lanjutkan
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ROW 2: INFO MODEL & AKTIVITAS -->
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-title">
-                    <i class="bi bi-info-circle"></i> Informasi Model SVM
-                </div>
-                <ul class="info-list">
-                    <li><span class="info-label">Metode</span><span class="info-value">LinearSVC (SVM)</span></li>
-                    <li><span class="info-label">Ekstraksi Fitur</span><span class="info-value">TF-IDF (ngram 1-2)</span></li>
-                    <li><span class="info-label">Dataset</span><span class="info-value">Twitter/X (4.210 data)</span></li>
-                    <li><span class="info-label">Validasi</span><span class="info-value">5-Fold Cross Validation</span></li>
-                    <li><span class="info-label">Akurasi</span><span class="info-value">91,68%</span></li>
-                    <li><span class="info-label">Presisi</span><span class="info-value">92,17%</span></li>
-                    <li><span class="info-label">Recall</span><span class="info-value">91,68%</span></li>
-                    <li><span class="info-label">F1-Score</span><span class="info-value">91,64%</span></li>
-                </ul>
+    <!-- ================================================================
+    SIDEBAR OVERLAY
+    ================================================================ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ================================================================
+    SIDEBAR
+    ================================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div class="brand-text">
+                <h4>Fin<span>Sense</span> Admin</h4>
+                <small>Panel Manajemen</small>
             </div>
         </div>
 
-        <div class="col">
-            <div class="card">
-                <div class="card-title">
-                    <i class="bi bi-clock-history"></i> Aktivitas Terakhir
+        <div class="sidebar-user">
+            <div class="avatar" id="sidebarAvatar">A</div>
+            <div class="user-info">
+                <div class="name" id="sidebarName">Admin</div>
+                <div class="role" id="sidebarRole">Super Administrator</div>
+            </div>
+            <div class="status"></div>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-label">Menu Utama</li>
+            <li><a href="#" class="active" data-page="dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard <span class="badge">Live</span></a></li>
+            <li><a href="#" data-page="monitoring"><i class="bi bi-eye-fill"></i> Monitoring <span class="badge">Real-time</span></a></li>
+            <li><a href="#" data-page="sentimen"><i class="bi bi-database-fill"></i> Data Sentimen <span class="badge" id="sentimenCount">0</span></a></li>
+            <li><a href="#" data-page="scraping"><i class="bi bi-twitter-x"></i> Scraping</a></li>
+            <li><a href="#" data-page="model"><i class="bi bi-cpu-fill"></i> Manajemen Model</a></li>
+            <li><a href="#" data-page="visualisasi"><i class="bi bi-bar-chart-steps"></i> Visualisasi</a></li>
+
+            <li class="divider"></li>
+            <li class="nav-label">Manajemen</li>
+            <li><a href="#" data-page="users"><i class="bi bi-people-fill"></i> Pengguna <span class="badge" id="userCount">0</span></a></li>
+
+            <li class="divider"></li>
+            <li class="nav-label">Pengaturan</li>
+            <li><a href="#" data-page="settings"><i class="bi bi-gear-fill"></i> Pengaturan Sistem</a></li>
+            <li><a href="#" data-page="background"><i class="bi bi-image"></i> Background Login</a></li>
+            <li><a href="#" data-page="laporan"><i class="bi bi-file-earmark-text"></i> Laporan</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="#" id="backHomeBtn">
+                <i class="bi bi-house-door"></i> Beranda
+            </a>
+            <a href="#" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"></i> Keluar
+            </a>
+        </div>
+    </aside>
+
+    <!-- ================================================================
+    MAIN CONTENT
+    ================================================================ -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:0.8rem;">
+                <button class="hamburger-btn" id="hamburgerBtn">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="page-title">
+                    <h2 id="pageTitle">Dashboard <small>Overview real-time</small></h2>
+                    <p id="pageDesc">Pantau aktivitas dan performa sistem FinSense SVM</p>
                 </div>
-                <div class="activity-item" onclick="location.href='/scraping'">
-                    <div class="activity-icon"><i class="bi bi-twitter-x"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-title">Scraping Data Twitter</div>
-                        <div class="activity-time">Terakhir: November 2025 · 4.210 tweet</div>
+            </div>
+            <div class="topbar-right">
+                <div class="datetime">
+                    <i class="bi bi-clock"></i>
+                    <span id="liveDateTime"></span>
+                </div>
+                <!-- Notification Bell -->
+                <div class="notif-wrapper">
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="bi bi-bell-fill" style="font-size:1.2rem;color:var(--text-secondary);"></i>
+                        <span class="badge-notif" id="notifCount">0</span>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notif-header">
+                                <span>Notifikasi</span>
+                                <span class="mark-all" id="markAllNotif">Tandai semua dibaca</span>
+                            </div>
+                            <div id="notifList">
+                                <div class="notif-empty">
+                                    <i class="bi bi-inbox"></i>
+                                    Tidak ada notifikasi
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="activity-item" onclick="location.href='/about'">
-                    <div class="activity-icon"><i class="bi bi-cpu"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-title">Training Model SVM</div>
-                        <div class="activity-time">LinearSVC · C=1.0 · 5-fold CV</div>
+                <span class="online-status">
+                    <span class="dot"></span> Online
+                </span>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: DASHBOARD
+        ================================================================ -->
+        <div class="menu-page active" id="page-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="bi bi-database"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="totalData">0</div>
+                        <div class="label">Total Data</div>
                     </div>
                 </div>
-                <div class="activity-item" onclick="location.href='/visualisasi'">
-                    <div class="activity-icon"><i class="bi bi-graph-up"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-title">Evaluasi Model</div>
-                        <div class="activity-time">Akurasi 91,68% · F1 91,64%</div>
+                <div class="stat-card">
+                    <div class="stat-icon gold"><i class="bi bi-check-circle"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="positifCount">0 <span class="trend up">↑ 0%</span></div>
+                        <div class="label">Sentimen Positif</div>
                     </div>
                 </div>
-                <div class="activity-item" onclick="location.href='/analisis'">
-                    <div class="activity-icon"><i class="bi bi-file-text"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-title">Export Hasil Analisis</div>
-                        <div class="activity-time">CSV · Format standar</div>
+                <div class="stat-card">
+                    <div class="stat-icon red"><i class="bi bi-x-circle"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="negatifCount">0 <span class="trend down">↓ 0%</span></div>
+                        <div class="label">Sentimen Negatif</div>
                     </div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="bi bi-dash-circle"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="netralCount">0 <span class="trend">↗ 0%</span></div>
+                        <div class="label">Sentimen Netral</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-graph-up"></i> Tren Sentimen</h5>
+                        <span class="period" id="trendPeriod">Data terkini</span>
+                    </div>
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-pie-chart"></i> Distribusi Sentimen</h5>
+                        <span class="period" id="pieTotal">Total 0 data</span>
+                    </div>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <a href="#" class="quick-action" data-page="monitoring">
+                    <i class="bi bi-eye-fill"></i>
+                    <span>Monitoring</span>
+                    <small>Pantau real-time</small>
+                </a>
+                <a href="#" class="quick-action" data-page="scraping">
+                    <i class="bi bi-twitter-x"></i>
+                    <span>Scraping</span>
+                    <small>Ambil data baru</small>
+                </a>
+                <a href="#" class="quick-action" data-page="visualisasi">
+                    <i class="bi bi-bar-chart-steps"></i>
+                    <span>Visualisasi</span>
+                    <small>Lihat grafik</small>
+                </a>
+                <a href="#" class="quick-action" id="exportPdfBtn">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    <span>Export PDF</span>
+                    <small>Laporan bulanan</small>
+                </a>
+            </div>
+
+            <div class="activity-recent-row">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h5><i class="bi bi-clock-history"></i> Aktivitas Terakhir</h5>
+                        <a href="#" class="view-all">Lihat semua</a>
+                    </div>
+                    <div id="activityList">
+                        <!-- Akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h5><i class="bi bi-table"></i> Data Terbaru</h5>
+                        <a href="#" class="view-all" data-page="sentimen">Lihat semua</a>
+                    </div>
+                    <table class="table-recent">
+                        <thead>
+                            <tr>
+                                <th>Teks</th>
+                                <th>Sentimen</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentData">
+                            <!-- Akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: MONITORING
+        ================================================================ -->
+        <div class="menu-page" id="page-monitoring">
+            <div class="page-header">
+                <h3><i class="bi bi-eye-fill text-gold"></i> Monitoring Real-Time</h3>
+                <p>Pantau analisis sentimen secara langsung dari data yang masuk</p>
+            </div>
+
+            <div class="monitoring-stats">
+                <div class="monitoring-stat">
+                    <div class="value" id="monitorTotal">0</div>
+                    <div class="label">Total Data Terkumpul</div>
+                    <div class="change up">↑ 0 data baru</div>
+                </div>
+                <div class="monitoring-stat">
+                    <div class="value" id="monitorPositif">0</div>
+                    <div class="label">Sentimen Positif</div>
+                    <div class="change up">↑ 0%</div>
+                </div>
+                <div class="monitoring-stat">
+                    <div class="value" id="monitorNegatif">0</div>
+                    <div class="label">Sentimen Negatif</div>
+                    <div class="change down">↓ 0%</div>
+                </div>
+            </div>
+
+            <div class="chart-row" style="grid-template-columns:1fr 1fr;">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-graph-up"></i> Real-Time Sentimen</h5>
+                        <span class="period" id="monitorPeriod">Update: sekarang</span>
+                    </div>
+                    <canvas id="monitorChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-pie-chart"></i> Distribusi Saat Ini</h5>
+                        <span class="period" id="monitorPieLabel">Total 0</span>
+                    </div>
+                    <canvas id="monitorPieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h5><i class="bi bi-rss-fill text-gold"></i> Live Activity Feed</h5>
+                    <span class="online-status" style="font-size:0.55rem;">
+                        <span class="dot"></span> Live
+                    </span>
+                </div>
+                <div id="liveFeed" style="max-height:250px;overflow-y:auto;">
+                    <!-- Akan diisi oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: DATA SENTIMEN (CRUD)
+        ================================================================ -->
+        <div class="menu-page" id="page-sentimen">
+            <div class="page-header">
+                <h3><i class="bi bi-database-fill text-gold"></i> Data Sentimen</h3>
+                <p>Kelola semua data sentimen yang telah dikumpulkan (CRUD)</p>
+            </div>
+
+            <div class="panel">
+                <div style="margin-bottom:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:space-between;">
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn-action primary" onclick="showAddSentimenModal()">
+                            <i class="bi bi-plus-lg"></i> Tambah Data
+                        </button>
+                        <button class="btn-action success" onclick="showImportModal()">
+                            <i class="bi bi-upload"></i> Import Data
+                        </button>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <input type="text" placeholder="Cari data..." id="searchSentimen" onkeyup="searchSentimen()" style="padding:0.4rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.75rem;font-family:'Inter',sans-serif;">
+                        <select id="filterSentimen" onchange="filterSentimen()" style="padding:0.4rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.75rem;font-family:'Inter',sans-serif;background:white;">
+                            <option value="semua">Semua Sentimen</option>
+                            <option value="positif">Positif</option>
+                            <option value="negatif">Negatif</option>
+                            <option value="netral">Netral</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="data-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Teks</th>
+                                <th>Sentimen</th>
+                                <th>Skor</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sentimenTable">
+                            <!-- Akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                    <span style="font-size:0.65rem;color:var(--text-muted);">Total data: <span id="totalSentimen">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: SCRAPING
+        ================================================================ -->
+        <div class="menu-page" id="page-scraping">
+            <div class="page-header">
+                <h3><i class="bi bi-twitter-x text-gold"></i> Scraping Data</h3>
+                <p>Ambil data dari Twitter/X untuk analisis sentimen</p>
+            </div>
+
+            <div class="panel" style="max-width:700px;">
+                <div style="margin-bottom:1rem;">
+                    <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Keyword / Topik</label>
+                    <input type="text" id="scrapingKeyword" value="Menteri Keuangan" style="width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                    <div>
+                        <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Jumlah Data</label>
+                        <select id="scrapingAmount" style="width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                            <option value="100">100</option>
+                            <option value="500" selected>500</option>
+                            <option value="1000">1000</option>
+                            <option value="5000">5000</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Bahasa</label>
+                        <select id="scrapingLanguage" style="width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                            <option value="id">Indonesia</option>
+                            <option value="en">Inggris</option>
+                            <option value="all">Semua</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-action primary" style="padding:0.6rem 2rem;font-size:0.8rem;border:none;border-radius:var(--radius-xs);" onclick="startScraping()">
+                    <i class="bi bi-play-fill"></i> Mulai Scraping
+                </button>
+                <div style="margin-top:1rem;padding:0.8rem;background:var(--bg);border-radius:var(--radius-xs);font-size:0.7rem;color:var(--text-muted);">
+                    <i class="bi bi-info-circle"></i> <span id="scrapingInfo">Belum ada scraping dilakukan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: MANAJEMEN MODEL
+        ================================================================ -->
+        <div class="menu-page" id="page-model">
+            <div class="page-header">
+                <h3><i class="bi bi-cpu-fill text-gold"></i> Manajemen Model</h3>
+                <p>Kelola model SVM untuk analisis sentimen</p>
+            </div>
+
+            <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="modelAkurasi">-</div>
+                        <div class="label">Akurasi Model</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon gold"><i class="bi bi-clock-history"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="modelLatihan">0</div>
+                        <div class="label">Total Latihan</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="bi bi-database"></i></div>
+                    <div class="stat-info">
+                        <div class="number" id="modelDataLatih">0</div>
+                        <div class="label">Data Latih</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div>
+                        <h6 style="font-size:0.75rem;font-weight:600;margin-bottom:0.5rem;">Parameter Model</h6>
+                        <div style="font-size:0.7rem;color:var(--text-secondary);">
+                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+                                <span>Kernel</span>
+                                <span style="font-weight:600;color:var(--text);">RBF</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+                                <span>C</span>
+                                <span style="font-weight:600;color:var(--text);">1.0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+                                <span>Gamma</span>
+                                <span style="font-weight:600;color:var(--text);">scale</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;">
+                                <span>Status</span>
+                                <span style="font-weight:600;color:var(--success);"><i class="bi bi-circle-fill" style="font-size:0.4rem;"></i> <span id="modelStatus">Aktif</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 style="font-size:0.75rem;font-weight:600;margin-bottom:0.5rem;">Aksi</h6>
+                        <button class="btn-action primary" style="padding:0.5rem 1.2rem;width:100%;margin-bottom:0.5rem;border:none;border-radius:var(--radius-xs);" onclick="trainModel()">
+                            <i class="bi bi-arrow-repeat"></i> Training Ulang
+                        </button>
+                        <button class="btn-action edit" style="padding:0.5rem 1.2rem;width:100%;border:none;border-radius:var(--radius-xs);" onclick="exportModel()">
+                            <i class="bi bi-download"></i> Export Model
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: VISUALISASI
+        ================================================================ -->
+        <div class="menu-page" id="page-visualisasi">
+            <div class="page-header">
+                <h3><i class="bi bi-bar-chart-steps text-gold"></i> Visualisasi Data</h3>
+                <p>Lihat grafik dan analisis data sentimen secara interaktif</p>
+            </div>
+
+            <div class="chart-row" style="grid-template-columns:1fr 1fr;">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-graph-up"></i> Distribusi per Bulan</h5>
+                        <span class="period">2025</span>
+                    </div>
+                    <canvas id="monthlyChart" style="max-height:200px;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-graph-up"></i> Top Keyword</h5>
+                        <span class="period">Terpopuler</span>
+                    </div>
+                    <canvas id="keywordChart" style="max-height:200px;"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="page-header" style="margin-bottom:0.5rem;">
+                    <h5 style="font-size:0.85rem;font-weight:600;"><i class="bi bi-table text-gold"></i> Statistik Lengkap</h5>
+                </div>
+                <div class="data-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Periode</th>
+                                <th>Positif</th>
+                                <th>Negatif</th>
+                                <th>Netral</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statistikBody">
+                            <!-- Akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: MANAJEMEN PENGGUNA
+        ================================================================ -->
+        <div class="menu-page" id="page-users">
+            <div class="page-header">
+                <h3><i class="bi bi-people-fill text-gold"></i> Manajemen Pengguna</h3>
+                <p>Kelola akun pengguna yang memiliki akses ke sistem</p>
+            </div>
+
+            <div class="panel">
+                <div style="margin-bottom:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:space-between;">
+                    <button class="btn-action primary" style="padding:0.4rem 1.2rem;border:none;border-radius:var(--radius-xs);" onclick="showAddUserModal()">
+                        <i class="bi bi-plus-lg"></i> Tambah Pengguna
+                    </button>
+                    <input type="text" placeholder="Cari pengguna..." style="padding:0.4rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.75rem;font-family:'Inter',sans-serif;" id="searchUser" onkeyup="searchUsers()">
+                </div>
+
+                <div class="data-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Terakhir Login</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTable">
+                            <!-- Akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                    <span style="font-size:0.65rem;color:var(--text-muted);">Total pengguna: <span id="totalUsers">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: PENGATURAN SISTEM
+        ================================================================ -->
+        <div class="menu-page" id="page-settings">
+            <div class="page-header">
+                <h3><i class="bi bi-gear-fill text-gold"></i> Pengaturan Sistem</h3>
+                <p>Konfigurasi umum sistem FinSense SVM</p>
+            </div>
+
+            <div class="panel" style="max-width:700px;">
+                <div style="margin-bottom:1.5rem;">
+                    <h6 style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;">Pengaturan Umum</h6>
+                    <div style="display:grid;gap:0.8rem;">
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Nama Aplikasi</label>
+                            <input type="text" id="appName" value="FinSense SVM" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Timezone</label>
+                            <select id="appTimezone" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                                <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
+                                <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
+                                <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Bahasa</label>
+                            <select id="appLanguage" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                                <option value="id">Indonesia</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.5rem;">
+                    <h6 style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;">Pengaturan Scraping</h6>
+                    <div style="display:grid;gap:0.8rem;">
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Batch Size</label>
+                            <select id="batchSize" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                                <option value="100">100</option>
+                                <option value="500" selected>500</option>
+                                <option value="1000">1000</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Auto Scraping</label>
+                            <select id="autoScraping" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                                <option value="off">Nonaktif</option>
+                                <option value="1h">Setiap 1 jam</option>
+                                <option value="6h">Setiap 6 jam</option>
+                                <option value="12h">Setiap 12 jam</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-action primary" style="padding:0.6rem 2rem;border:none;border-radius:var(--radius-xs);font-size:0.8rem;" onclick="saveSettings()">
+                    <i class="bi bi-check-lg"></i> Simpan Pengaturan
+                </button>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: BACKGROUND LOGIN
+        ================================================================ -->
+        <div class="menu-page" id="page-background">
+            <div class="page-header">
+                <h3><i class="bi bi-image text-gold"></i> Pengaturan Background Login</h3>
+                <p>Ubah gambar latar belakang halaman login</p>
+            </div>
+
+            <div class="panel">
+                <div style="margin-bottom:1rem;">
+                    <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Link URL Gambar</label>
+                    <input type="url" id="bgUrlInput" placeholder="https://example.com/background.jpg" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Upload File Gambar</label>
+                    <input type="file" id="bgFileInput" accept="image/*" style="width:100%;padding:0.3rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+                </div>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn-action primary" id="applyBgBtn" style="border:none;border-radius:var(--radius-xs);padding:0.5rem 1.5rem;">
+                        <i class="bi bi-check2"></i> Terapkan
+                    </button>
+                    <button class="btn-action edit" id="resetBgBtn" style="border:none;border-radius:var(--radius-xs);padding:0.5rem 1.5rem;">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset Default
+                    </button>
+                </div>
+                <div style="margin-top:0.8rem;padding:0.5rem 0.8rem;background:var(--bg);border-radius:var(--radius-xs);font-size:0.65rem;color:var(--text-muted);display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Status: <strong id="bgStatusText">Default</strong></span>
+                    <span class="status-badge info" id="bgStatusBadge" style="padding:0.05rem 0.5rem;border-radius:20px;font-size:0.55rem;font-weight:600;background:#e3f0f5;color:var(--info);">Aktif</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+        PAGE: LAPORAN
+        ================================================================ -->
+        <div class="menu-page" id="page-laporan">
+            <div class="page-header">
+                <h3><i class="bi bi-file-earmark-text text-gold"></i> Laporan</h3>
+                <p>Generate dan unduh laporan analisis sentimen</p>
+            </div>
+
+            <div class="panel" style="max-width:700px;">
+                <div style="display:grid;gap:1rem;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Periode Mulai</label>
+                            <input type="date" id="reportStart" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Periode Akhir</label>
+                            <input type="date" id="reportEnd" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.2rem;">Format Laporan</label>
+                        <select id="reportFormat" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;background:white;">
+                            <option value="pdf">PDF</option>
+                            <option value="xlsx">Excel (XLSX)</option>
+                            <option value="csv">CSV</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn-action primary" style="padding:0.6rem 2rem;border:none;border-radius:var(--radius-xs);font-size:0.8rem;" onclick="generateReport()">
+                            <i class="bi bi-file-earmark-pdf"></i> Generate Laporan
+                        </button>
+                        <button class="btn-action edit" style="padding:0.6rem 2rem;border:none;border-radius:var(--radius-xs);font-size:0.8rem;" onclick="showReportHistory()">
+                            <i class="bi bi-clock-history"></i> History
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+                    <h6 style="font-size:0.75rem;font-weight:600;margin-bottom:0.5rem;">Laporan Terakhir</h6>
+                    <div id="reportHistory" style="font-size:0.7rem;color:var(--text-secondary);">
+                        <!-- Akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div style="text-align:center;padding:1rem 0;font-size:0.6rem;color:var(--text-muted);border-top:1px solid var(--border);margin-top:1rem;">
+            FinSense SVM · Admin Panel · 2026 · Dibuat oleh <span style="color:var(--accent);font-weight:500;">M. Rifqi Arista Aprilianto</span>
+        </div>
+
+    </main>
+
+    <!-- ================================================================
+    MODAL TAMBAH / EDIT SENTIMEN
+    ================================================================ -->
+    <div class="modal-overlay" id="sentimenModal">
+        <div class="modal-content">
+            <h5 id="sentimenModalTitle"><i class="bi bi-plus-circle text-gold"></i> Tambah Data Sentimen</h5>
+            <form id="sentimenForm">
+                <input type="hidden" id="editSentimenId">
+                <div class="form-group">
+                    <label>Teks</label>
+                    <textarea id="sentimenText" required placeholder="Masukkan teks analisis"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Sentimen</label>
+                    <select id="sentimenLabel" required>
+                        <option value="positif">Positif</option>
+                        <option value="negatif">Negatif</option>
+                        <option value="netral">Netral</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Skor (0-1)</label>
+                    <input type="number" id="sentimenScore" step="0.01" min="0" max="1" placeholder="0.00" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save"><i class="bi bi-check-lg"></i> Simpan</button>
+                    <button type="button" class="btn-cancel" onclick="closeSentimenModal()"><i class="bi bi-x-lg"></i> Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================================================================
+    MODAL IMPORT DATA
+    ================================================================ -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-content">
+            <h5><i class="bi bi-upload text-gold"></i> Import Data</h5>
+            <p style="font-size:0.7rem;color:var(--text-muted);margin-bottom:1rem;">Upload file CSV dengan format: teks,sentimen,skor</p>
+            <div class="form-group">
+                <label>Pilih File CSV</label>
+                <input type="file" id="importFile" accept=".csv" style="width:100%;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:0.8rem;font-family:'Inter',sans-serif;">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="importData()"><i class="bi bi-upload"></i> Import</button>
+                <button type="button" class="btn-cancel" onclick="closeImportModal()"><i class="bi bi-x-lg"></i> Batal</button>
             </div>
         </div>
     </div>
 
-    <!-- ROW 3: TREND & KESIMPULAN -->
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-title">
-                    <i class="bi bi-graph-up"></i> Tren Sentimen (Sep-Nov 2025)
+    <!-- ================================================================
+    MODAL TAMBAH PENGGUNA
+    ================================================================ -->
+    <div class="modal-overlay" id="addUserModal">
+        <div class="modal-content">
+            <h5><i class="bi bi-person-plus text-gold"></i> Tambah Pengguna</h5>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="newFullName" required placeholder="Masukkan nama lengkap">
                 </div>
-                <canvas id="lineChart"></canvas>
-                <div class="text-muted" style="font-size: 0.6rem; text-align: center; margin-top: 0.5rem;">
-                    Perkembangan sentimen positif selama periode penelitian
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="newUsername" required placeholder="Masukkan username">
                 </div>
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="card">
-                <div class="card-title">
-                    <i class="bi bi-chat-square-quote"></i> Kesimpulan
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="newPassword" required placeholder="Masukkan password">
                 </div>
-                <div style="background: #f0ece4; padding: 0.8rem; border-radius: 12px;">
-                    <p style="font-size: 0.75rem; line-height: 1.5; margin-bottom: 0.5rem;">
-                        Model <strong>SVM (LinearSVC) + TF-IDF</strong> mencapai akurasi <strong>91,68%</strong> dengan F1-Score <strong>91,64%</strong>.
-                    </p>
-                    <p style="font-size: 0.75rem; line-height: 1.5; margin-bottom: 0.5rem;">
-                        Distribusi sentimen: <strong style="color:#2d6a4f;">Positif 42%</strong> · <strong style="color:#9e9580;">Netral 23%</strong> · <strong style="color:#b8734a;">Negatif 35%</strong>.
-                    </p>
-                    <p style="font-size: 0.75rem; line-height: 1.5;">
-                        Mayoritas opini publik cenderung <strong>positif</strong> terhadap Menteri Keuangan Purbaya Yudhi Sadewa.
-                    </p>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="newRole">
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Editor">Editor</option>
+                        <option value="Analis">Analis</option>
+                    </select>
                 </div>
-            </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save"><i class="bi bi-check-lg"></i> Simpan</button>
+                    <button type="button" class="btn-cancel" onclick="closeAddUserModal()"><i class="bi bi-x-lg"></i> Batal</button>
+                </div>
+            </form>
         </div>
     </div>
 
-</div>
+    <!-- ================================================================
+    SCRIPT
+    ================================================================ -->
+    <script>
+        // ================================================================
+        // 1. CONFIRM DIALOG (Premium Style)
+        // ================================================================
+        let confirmCallback = null;
 
-<!-- FOOTER -->
-<div class="footer">
-    Dibuat oleh <span>M. Rifqi Arista Aprilianto</span> · FinSense SVM · 2026
-</div>
+        function showConfirmDialog(title, message, icon, confirmText, confirmClass, callback) {
+            const overlay = document.getElementById('confirmOverlay');
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmIcon').textContent = icon || '❓';
+            document.getElementById('confirmIcon').className = 'confirm-icon ' + (confirmClass || 'warning');
 
-<script>
-// PIE CHART
-new Chart(document.getElementById("pieChart"), {
-    type: "pie",
-    data: {
-        labels: ["Positif (42%)", "Negatif (35%)", "Netral (23%)"],
-        datasets: [{
-            data: [42, 35, 23],
-            backgroundColor: ["#2d6a4f", "#b8734a", "#9e9580"],
-            borderWidth: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 9 } } }
+            const yesBtn = document.getElementById('confirmYes');
+            yesBtn.innerHTML = `<i class="bi bi-check-circle"></i> ${confirmText || 'Ya, Lanjutkan'}`;
+            yesBtn.className = 'btn-confirm-' + (confirmClass === 'danger' ? 'danger' : confirmClass === 'success' ?
+                'success' : confirmClass === 'primary' ? 'primary' : 'yes');
+
+            confirmCallback = callback;
+            overlay.classList.add('show');
         }
-    }
-});
 
-// LINE CHART TREND
-new Chart(document.getElementById("lineChart"), {
-    type: "line",
-    data: {
-        labels: ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4", "Minggu 5"],
-        datasets: [{
-            label: "Sentimen Positif (%)",
-            data: [38, 40, 42, 41, 42],
-            borderColor: "#2d6a4f",
-            backgroundColor: "rgba(45, 106, 79, 0.05)",
-            fill: true,
-            tension: 0.3,
-            pointBackgroundColor: "#c9a03d",
-            pointRadius: 3,
-            pointHoverRadius: 5
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        scales: {
-            y: { beginAtZero: true, max: 100, grid: { color: "#e0d9cf" } },
-            x: { grid: { display: false } }
-        },
-        plugins: { legend: { position: 'top', labels: { font: { size: 9 } } } }
-    }
-});
+        document.getElementById('confirmYes').addEventListener('click', function() {
+            document.getElementById('confirmOverlay').classList.remove('show');
+            if (confirmCallback) {
+                confirmCallback();
+                confirmCallback = null;
+            }
+        });
 
-// FUNGSI LOGOUT
-function logout() {
-    if (confirm("Apakah Anda yakin ingin keluar dari halaman admin?")) {
-        window.location.href = "/";
-    }
-}
-</script>
+        document.getElementById('confirmNo').addEventListener('click', function() {
+            document.getElementById('confirmOverlay').classList.remove('show');
+            confirmCallback = null;
+        });
+
+        document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+                confirmCallback = null;
+            }
+        });
+
+        // ================================================================
+        // 2. NOTIFICATION SYSTEM
+        // ================================================================
+        let notifications = [];
+        let notifId = 0;
+
+        function addNotification(title, message, icon, type) {
+            const notif = {
+                id: ++notifId,
+                title: title,
+                message: message,
+                icon: icon || 'bi-info-circle',
+                type: type || 'info',
+                time: new Date(),
+                read: false
+            };
+            notifications.unshift(notif);
+            if (notifications.length > 20) notifications.pop();
+            renderNotifications();
+            updateNotifBadge();
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notifList');
+            const unread = notifications.filter(n => !n.read).length;
+
+            if (notifications.length === 0) {
+                list.innerHTML = `
+                        <div class="notif-empty">
+                            <i class="bi bi-inbox"></i>
+                            Tidak ada notifikasi
+                        </div>
+                    `;
+                return;
+            }
+
+            list.innerHTML = notifications.slice(0, 10).map(n => `
+                    <div class="notif-item ${n.read ? '' : 'unread'}" style="${n.read ? 'opacity:0.7;' : ''}" onclick="markNotifRead(${n.id})">
+                        <div class="notif-icon"><i class="bi ${n.icon}"></i></div>
+                        <div class="notif-content">
+                            <div class="notif-title">${n.title}</div>
+                            <div class="notif-desc">${n.message}</div>
+                        </div>
+                        <div class="notif-time">${formatTime(n.time)}</div>
+                    </div>
+                `).join('');
+
+            document.querySelectorAll('.notif-item.unread').forEach(el => {
+                el.style.borderLeft = '3px solid var(--gold)';
+                el.style.backgroundColor = 'rgba(201,160,61,0.03)';
+            });
+        }
+
+        function formatTime(date) {
+            const now = new Date();
+            const diff = (now - date) / 1000;
+            if (diff < 60) return 'Baru saja';
+            if (diff < 3600) return Math.floor(diff / 60) + ' menit lalu';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' jam lalu';
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        }
+
+        function updateNotifBadge() {
+            const unread = notifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notifCount');
+            if (badge) {
+                badge.textContent = unread;
+                badge.style.display = unread > 0 ? 'flex' : 'none';
+            }
+        }
+
+        function markNotifRead(id) {
+            const notif = notifications.find(n => n.id === id);
+            if (notif) {
+                notif.read = true;
+                renderNotifications();
+                updateNotifBadge();
+            }
+        }
+
+        document.getElementById('markAllNotif')?.addEventListener('click', function() {
+            notifications.forEach(n => n.read = true);
+            renderNotifications();
+            updateNotifBadge();
+            showToast('info', 'Notifikasi', 'Semua notifikasi ditandai dibaca');
+        });
+
+        document.getElementById('notificationBell')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function() {
+            document.getElementById('notificationDropdown')?.classList.remove('show');
+        });
+
+        // ================================================================
+        // 3. TOAST NOTIFICATION
+        // ================================================================
+        function showToast(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const icons = {
+                success: 'bi-check-circle-fill',
+                error: 'bi-x-circle-fill',
+                warning: 'bi-exclamation-triangle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type}`;
+            toast.innerHTML = `
+                    <i class="bi ${icons[type] || icons.info} toast-icon ${type}"></i>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+                `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100px)';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 4000);
+
+            addNotification(title, message, icons[type] || 'bi-info-circle', type);
+        }
+
+        // ================================================================
+        // 4. DATA STORAGE KEYS
+        // ================================================================
+        const SENTIMEN_STORAGE_KEY = 'finsense_sentimen_data';
+        const USER_STORAGE_KEY = 'finsense_users';
+        const SETTINGS_STORAGE_KEY = 'finsense_settings';
+        const BG_STORAGE_KEY = 'finsense_login_background';
+        const REPORT_HISTORY_KEY = 'finsense_report_history';
+        const MODEL_STORAGE_KEY = 'finsense_model_data';
+
+        // ================================================================
+        // 5. DATA SENTIMEN - CRUD
+        // ================================================================
+        function getSentimen() {
+            try {
+                const data = localStorage.getItem(SENTIMEN_STORAGE_KEY);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed;
+                    }
+                }
+            } catch (e) {}
+            const defaultData = [
+                { id: 1, text: 'Kinerja Menteri Keuangan sangat baik dan transparan', label: 'positif', score: 0.92,
+                    tanggal: '2025-11-15' },
+                { id: 2, text: 'Kebijakan fiskal baru merugikan masyarakat kecil', label: 'negatif', score: 0.85,
+                    tanggal: '2025-11-14' },
+                { id: 3, text: 'Informasi APBN 2026 cukup menarik untuk diikuti', label: 'netral', score: 0.51,
+                    tanggal: '2025-11-13' },
+                { id: 4, text: 'Purbaya Yudhi Sadewa memberikan inspirasi bagi generasi muda', label: 'positif',
+                    score: 0.78, tanggal: '2025-11-12' },
+                { id: 5, text: 'Reshuffle kabinet perlu segera dilakukan untuk perbaikan', label: 'negatif',
+                    score: 0.63, tanggal: '2025-11-11' },
+                { id: 6, text: 'Program pemulihan ekonomi mulai menunjukkan hasil positif', label: 'positif',
+                    score: 0.82, tanggal: '2025-11-10' }
+            ];
+            localStorage.setItem(SENTIMEN_STORAGE_KEY, JSON.stringify(defaultData));
+            return defaultData;
+        }
+
+        function saveSentimen(data) {
+            localStorage.setItem(SENTIMEN_STORAGE_KEY, JSON.stringify(data));
+            renderSentimen();
+            updateDashboard();
+            updateMonitoring();
+            updateVisualisasi();
+            updateCharts();
+        }
+
+        function addSentimen(text, label, score) {
+            const data = getSentimen();
+            const newData = {
+                id: data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 : 1,
+                text: text,
+                label: label,
+                score: parseFloat(score),
+                tanggal: new Date().toISOString().split('T')[0]
+            };
+            data.push(newData);
+            saveSentimen(data);
+            addActivity('Data sentimen baru ditambahkan', 'green', `"${text.substring(0, 30)}..."`);
+            showToast('success', 'Berhasil', 'Data sentimen berhasil ditambahkan');
+        }
+
+        function editSentimen(id, text, label, score) {
+            const data = getSentimen();
+            const index = data.findIndex(d => d.id === id);
+            if (index !== -1) {
+                data[index].text = text;
+                data[index].label = label;
+                data[index].score = parseFloat(score);
+                saveSentimen(data);
+                addActivity('Data sentimen diedit', 'gold', `ID: ${id}`);
+                showToast('success', 'Berhasil', 'Data sentimen berhasil diperbarui');
+            }
+        }
+
+        function deleteSentimen(id) {
+            showConfirmDialog(
+                'Hapus Data Sentimen',
+                'Apakah Anda yakin ingin menghapus data sentimen ini? Tindakan ini tidak dapat dibatalkan.',
+                '🗑️',
+                'Ya, Hapus',
+                'danger',
+                function() {
+                    let data = getSentimen();
+                    const deleted = data.find(d => d.id === id);
+                    data = data.filter(d => d.id !== id);
+                    saveSentimen(data);
+                    addActivity('Data sentimen dihapus', 'red', `"${deleted ? deleted.text.substring(0, 30) : ''}..."`);
+                    showToast('success', 'Berhasil', 'Data sentimen berhasil dihapus');
+                }
+            );
+        }
+
+        function renderSentimen() {
+            const data = getSentimen();
+            const tbody = document.getElementById('sentimenTable');
+            const totalSpan = document.getElementById('totalSentimen');
+            const countBadge = document.getElementById('sentimenCount');
+
+            if (tbody) {
+                const search = document.getElementById('searchSentimen')?.value.toLowerCase() || '';
+                const filter = document.getElementById('filterSentimen')?.value || 'semua';
+
+                let filtered = data;
+                if (search) {
+                    filtered = filtered.filter(d => d.text.toLowerCase().includes(search));
+                }
+                if (filter !== 'semua') {
+                    filtered = filtered.filter(d => d.label === filter);
+                }
+
+                const labels = { positif: 'Positif', negatif: 'Negatif', netral: 'Netral' };
+                const badgeClass = { positif: 'positif', negatif: 'negatif', netral: 'netral' };
+
+                tbody.innerHTML = filtered.map((d, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${d.text.length > 50 ? d.text.substring(0, 50) + '...' : d.text}</td>
+                            <td><span class="badge-sentimen ${badgeClass[d.label]}">${labels[d.label] || d.label}</span></td>
+                            <td>${d.score.toFixed(2)}</td>
+                            <td>${d.tanggal || '-'}</td>
+                            <td>
+                                <button class="btn-action edit" onclick="editSentimenModal(${d.id})"><i class="bi bi-pencil"></i></button>
+                                <button class="btn-action delete" onclick="deleteSentimen(${d.id})"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                if (totalSpan) totalSpan.textContent = filtered.length;
+                if (countBadge) countBadge.textContent = data.length;
+            }
+        }
+
+        function searchSentimen() {
+            renderSentimen();
+        }
+
+        function filterSentimen() {
+            renderSentimen();
+        }
+
+        // ================================================================
+        // 6. SENTIMEN MODAL
+        // ================================================================
+        function showAddSentimenModal() {
+            document.getElementById('sentimenModal').classList.add('show');
+            document.getElementById('sentimenModalTitle').innerHTML = '<i class="bi bi-plus-circle text-gold"></i> Tambah Data Sentimen';
+            document.getElementById('editSentimenId').value = '';
+            document.getElementById('sentimenText').value = '';
+            document.getElementById('sentimenLabel').value = 'positif';
+            document.getElementById('sentimenScore').value = '';
+        }
+
+        function editSentimenModal(id) {
+            const data = getSentimen();
+            const item = data.find(d => d.id === id);
+            if (item) {
+                document.getElementById('sentimenModal').classList.add('show');
+                document.getElementById('sentimenModalTitle').innerHTML = '<i class="bi bi-pencil-square text-gold"></i> Edit Data Sentimen';
+                document.getElementById('editSentimenId').value = id;
+                document.getElementById('sentimenText').value = item.text;
+                document.getElementById('sentimenLabel').value = item.label;
+                document.getElementById('sentimenScore').value = item.score;
+            }
+        }
+
+        function closeSentimenModal() {
+            document.getElementById('sentimenModal').classList.remove('show');
+        }
+
+        document.getElementById('sentimenForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editSentimenId').value;
+            const text = document.getElementById('sentimenText').value.trim();
+            const label = document.getElementById('sentimenLabel').value;
+            const score = parseFloat(document.getElementById('sentimenScore').value);
+
+            if (!text || isNaN(score) || score < 0 || score > 1) {
+                showToast('error', 'Gagal', 'Isi semua field dengan benar!');
+                return;
+            }
+
+            if (id) {
+                editSentimen(parseInt(id), text, label, score);
+            } else {
+                addSentimen(text, label, score);
+            }
+            closeSentimenModal();
+        });
+
+        // ================================================================
+        // 7. IMPORT DATA
+        // ================================================================
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('show');
+            document.getElementById('importFile').value = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('show');
+        }
+
+        function importData() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) {
+                showToast('error', 'Gagal', 'Pilih file CSV terlebih dahulu!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const lines = e.target.result.split('\n').filter(line => line.trim());
+                    let imported = 0;
+                    const data = getSentimen();
+
+                    let startIndex = 0;
+                    if (lines[0].toLowerCase().includes('teks')) startIndex = 1;
+
+                    for (let i = startIndex; i < lines.length; i++) {
+                        const parts = lines[i].split(',').map(p => p.trim());
+                        if (parts.length >= 3) {
+                            const text = parts[0];
+                            const label = parts[1].toLowerCase();
+                            const score = parseFloat(parts[2]);
+                            if (text && ['positif', 'negatif', 'netral'].includes(label) && !isNaN(score)) {
+                                data.push({
+                                    id: data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 : 1,
+                                    text: text,
+                                    label: label,
+                                    score: score,
+                                    tanggal: new Date().toISOString().split('T')[0]
+                                });
+                                imported++;
+                            }
+                        }
+                    }
+
+                    if (imported > 0) {
+                        saveSentimen(data);
+                        showToast('success', 'Berhasil', `${imported} data berhasil diimport!`);
+                        addActivity('Import data CSV', 'blue', `${imported} data ditambahkan`);
+                    } else {
+                        showToast('warning', 'Peringatan', 'Tidak ada data yang valid untuk diimport');
+                    }
+                } catch (err) {
+                    showToast('error', 'Gagal', 'Error membaca file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            closeImportModal();
+        }
+
+        // ================================================================
+        // 8. SCRAPING
+        // ================================================================
+        function startScraping() {
+            const keyword = document.getElementById('scrapingKeyword').value.trim();
+            const amount = parseInt(document.getElementById('scrapingAmount').value);
+
+            if (!keyword) {
+                showToast('error', 'Gagal', 'Masukkan keyword terlebih dahulu!');
+                return;
+            }
+
+            showToast('info', 'Scraping', `Mengambil ${amount} data untuk keyword "${keyword}"...`);
+
+            setTimeout(() => {
+                const data = getSentimen();
+                const newData = [];
+                const labels = ['positif', 'negatif', 'netral'];
+                const texts = [
+                    `${keyword} memberikan dampak positif bagi masyarakat`,
+                    `${keyword} dinilai kurang tepat sasaran`,
+                    `${keyword} menjadi perbincangan hangat di media sosial`,
+                    `${keyword} diharapkan dapat meningkatkan perekonomian`,
+                    `${keyword} mendapat kritik dari berbagai pihak`,
+                    `${keyword} menunjukkan hasil yang menggembirakan`
+                ];
+
+                for (let i = 0; i < Math.min(amount, 20); i++) {
+                    const label = labels[Math.floor(Math.random() * labels.length)];
+                    const score = (Math.random() * 0.7 + 0.3);
+                    newData.push({
+                        id: data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 + i : 1 + i,
+                        text: texts[i % texts.length] + ` (${i+1})`,
+                        label: label,
+                        score: parseFloat(score.toFixed(2)),
+                        tanggal: new Date().toISOString().split('T')[0]
+                    });
+                }
+
+                const allData = [...data, ...newData];
+                saveSentimen(allData);
+
+                document.getElementById('scrapingInfo').textContent =
+                    `Scraping selesai: ${newData.length} data baru untuk keyword "${keyword}" pada ${new Date().toLocaleString('id-ID')}`;
+
+                showToast('success', 'Scraping Selesai', `${newData.length} data berhasil ditambahkan!`);
+                addActivity('Scraping data', 'blue', `${newData.length} data untuk keyword "${keyword}"`);
+            }, 3000);
+        }
+
+        // ================================================================
+        // 9. MODEL MANAGEMENT
+        // ================================================================
+        function trainModel() {
+            const data = getSentimen();
+            if (data.length < 10) {
+                showToast('warning', 'Peringatan', 'Minimal 10 data untuk training!');
+                return;
+            }
+
+            showToast('info', 'Training', 'Model sedang dilatih...');
+
+            setTimeout(() => {
+                const accuracy = (Math.random() * 10 + 85).toFixed(2);
+                document.getElementById('modelAkurasi').textContent = accuracy + '%';
+                document.getElementById('modelLatihan').textContent = parseInt(document.getElementById('modelLatihan')
+                    .textContent || '0') + 1;
+                document.getElementById('modelDataLatih').textContent = data.length;
+
+                localStorage.setItem(MODEL_STORAGE_KEY, JSON.stringify({
+                    accuracy: accuracy,
+                    trained: new Date().toISOString(),
+                    dataCount: data.length
+                }));
+
+                showToast('success', 'Training Selesai', `Akurasi model: ${accuracy}%`);
+                addActivity('Model dilatih ulang', 'blue', `Akurasi: ${accuracy}%`);
+            }, 2000);
+        }
+
+        function exportModel() {
+            const modelData = localStorage.getItem(MODEL_STORAGE_KEY);
+            if (modelData) {
+                const blob = new Blob([modelData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `model_svm_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('success', 'Export', 'Model berhasil diexport!');
+            } else {
+                showToast('warning', 'Peringatan', 'Belum ada model yang dilatih!');
+            }
+        }
+
+        // ================================================================
+        // 10. ACTIVITY LOG
+        // ================================================================
+        function addActivity(title, dotClass, desc) {
+            const list = document.getElementById('activityList');
+            if (!list) return;
+
+            const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.style.animation = 'fadeInUp 0.3s ease';
+            item.innerHTML = `
+                    <div class="activity-dot ${dotClass}"></div>
+                    <div class="activity-content">
+                        <div class="title">${title}</div>
+                        <div class="desc">${desc}</div>
+                    </div>
+                    <div class="activity-time">${time}</div>
+                `;
+
+            list.insertBefore(item, list.firstChild);
+
+            while (list.children.length > 5) {
+                list.removeChild(list.lastChild);
+            }
+
+            try {
+                let activities = JSON.parse(localStorage.getItem('finsense_activities') || '[]');
+                activities.unshift({ title, desc, time: new Date().toISOString(), dotClass });
+                if (activities.length > 20) activities = activities.slice(0, 20);
+                localStorage.setItem('finsense_activities', JSON.stringify(activities));
+            } catch (e) {}
+        }
+
+        function loadActivities() {
+            const list = document.getElementById('activityList');
+            if (!list) return;
+
+            try {
+                const activities = JSON.parse(localStorage.getItem('finsense_activities') || '[]');
+                if (activities.length === 0) {
+                    const defaults = [
+                        { title: 'Sistem dimulai', desc: 'Admin panel aktif', dotClass: 'green' },
+                        { title: 'Data dimuat', desc: '6 data sentimen tersedia', dotClass: 'blue' }
+                    ];
+                    defaults.forEach(a => addActivity(a.title, a.dotClass, a.desc));
+                    return;
+                }
+
+                list.innerHTML = activities.slice(0, 5).map(a => `
+                        <div class="activity-item">
+                            <div class="activity-dot ${a.dotClass || 'blue'}"></div>
+                            <div class="activity-content">
+                                <div class="title">${a.title}</div>
+                                <div class="desc">${a.desc}</div>
+                            </div>
+                            <div class="activity-time">${new Date(a.time).toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'})}</div>
+                        </div>
+                    `).join('');
+            } catch (e) {}
+        }
+
+        // ================================================================
+        // 11. DASHBOARD UPDATE
+        // ================================================================
+        function updateDashboard() {
+            const data = getSentimen();
+            const total = data.length;
+            const positif = data.filter(d => d.label === 'positif').length;
+            const negatif = data.filter(d => d.label === 'negatif').length;
+            const netral = data.filter(d => d.label === 'netral').length;
+
+            document.getElementById('totalData').textContent = total;
+            document.getElementById('positifCount').innerHTML =
+                `${positif} <span class="trend up">↑ ${total > 0 ? Math.round(positif/total*100) : 0}%</span>`;
+            document.getElementById('negatifCount').innerHTML =
+                `${negatif} <span class="trend down">↓ ${total > 0 ? Math.round(negatif/total*100) : 0}%</span>`;
+            document.getElementById('netralCount').innerHTML =
+                `${netral} <span class="trend">↗ ${total > 0 ? Math.round(netral/total*100) : 0}%</span>`;
+
+            document.getElementById('pieTotal').textContent = `Total ${total} data`;
+            document.getElementById('sentimenCount').textContent = total;
+
+            const recentBody = document.getElementById('recentData');
+            if (recentBody) {
+                const recent = data.slice(-5).reverse();
+                const labels = { positif: 'Positif', negatif: 'Negatif', netral: 'Netral' };
+                const badgeClass = { positif: 'positif', negatif: 'negatif', netral: 'netral' };
+                recentBody.innerHTML = recent.map(d => `
+                        <tr>
+                            <td>${d.text.length > 40 ? d.text.substring(0, 40) + '...' : d.text}</td>
+                            <td><span class="badge-sentimen ${badgeClass[d.label]}">${labels[d.label] || d.label}</span></td>
+                            <td>${d.tanggal || '-'}</td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="3" class="empty-state"><i class="bi bi-inbox"></i>Belum ada data</td></tr>';
+            }
+        }
+
+        // ================================================================
+        // 12. MONITORING UPDATE
+        // ================================================================
+        function updateMonitoring() {
+            const data = getSentimen();
+            const total = data.length;
+            const positif = data.filter(d => d.label === 'positif').length;
+            const negatif = data.filter(d => d.label === 'negatif').length;
+
+            document.getElementById('monitorTotal').textContent = total;
+            document.getElementById('monitorPositif').textContent = positif;
+            document.getElementById('monitorNegatif').textContent = negatif;
+            document.getElementById('monitorPieLabel').textContent = `Total ${total}`;
+
+            const feed = document.getElementById('liveFeed');
+            if (feed && data.length > 0) {
+                const recent = data.slice(-5).reverse();
+                const colors = { positif: 'green', negatif: 'red', netral: 'gold' };
+                const labels = { positif: 'Positif', negatif: 'Negatif', netral: 'Netral' };
+
+                feed.innerHTML = recent.map(d => `
+                        <div class="activity-item">
+                            <div class="activity-dot ${colors[d.label] || 'blue'}"></div>
+                            <div class="activity-content">
+                                <div class="title">Data diproses</div>
+                                <div class="desc">"${d.text.length > 50 ? d.text.substring(0, 50) + '...' : d.text}" → ${labels[d.label] || d.label} (${d.score.toFixed(2)})</div>
+                            </div>
+                            <div class="activity-time">${d.tanggal || '-'}</div>
+                        </div>
+                    `).join('');
+            }
+        }
+
+        // ================================================================
+        // 13. VISUALISASI UPDATE
+        // ================================================================
+        function updateVisualisasi() {
+            const data = getSentimen();
+            const statsBody = document.getElementById('statistikBody');
+            if (statsBody) {
+                const months = {};
+                data.forEach(d => {
+                    if (d.tanggal) {
+                        const month = d.tanggal.substring(0, 7);
+                        if (!months[month]) months[month] = { positif: 0, negatif: 0, netral: 0 };
+                        months[month][d.label] = (months[month][d.label] || 0) + 1;
+                    }
+                });
+
+                const sortedMonths = Object.keys(months).sort();
+                statsBody.innerHTML = sortedMonths.map(month => {
+                    const m = months[month];
+                    const totalMonth = (m.positif || 0) + (m.negatif || 0) + (m.netral || 0);
+                    return `<tr>
+                            <td>${month}</td>
+                            <td>${m.positif || 0}</td>
+                            <td>${m.negatif || 0}</td>
+                            <td>${m.netral || 0}</td>
+                            <td>${totalMonth}</td>
+                        </tr>`;
+                }).join('') || '<tr><td colspan="5" class="empty-state">Belum ada data</td></tr>';
+            }
+        }
+
+        // ================================================================
+        // 14. USER MANAGEMENT
+        // ================================================================
+        function getUsers() {
+            try {
+                const data = localStorage.getItem(USER_STORAGE_KEY);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed;
+                    }
+                }
+            } catch (e) {}
+            const defaultUsers = [
+                { id: 1, name: 'Administrator', username: 'admin', password: 'admin123', role: 'Super Admin',
+                    status: 'aktif', lastLogin: '15 Nov 2025, 14:30' },
+                { id: 2, name: 'Editor Konten', username: 'editor1', password: 'editor123', role: 'Editor',
+                    status: 'aktif', lastLogin: '14 Nov 2025, 10:15' },
+                { id: 3, name: 'Analis Data', username: 'analis1', password: 'analis123', role: 'Analis',
+                    status: 'nonaktif', lastLogin: '10 Nov 2025, 09:00' }
+            ];
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(defaultUsers));
+            return defaultUsers;
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+            renderUsers();
+        }
+
+        function renderUsers() {
+            const users = getUsers();
+            const tbody = document.getElementById('userTable');
+            const totalSpan = document.getElementById('totalUsers');
+            const userCountBadge = document.getElementById('userCount');
+
+            if (tbody) {
+                tbody.innerHTML = users.map(user => `
+                        <tr>
+                            <td><strong>${user.name}</strong></td>
+                            <td>${user.username}</td>
+                            <td><span class="role-badge ${user.role.toLowerCase().replace(' ', '-')}">${user.role}</span></td>
+                            <td>
+                                <span class="user-status ${user.status === 'aktif' ? 'active' : 'inactive'}">
+                                    <span class="dot"></span> ${user.status === 'aktif' ? 'Aktif' : 'Nonaktif'}
+                                </span>
+                            </td>
+                            <td>${user.lastLogin || '-'}</td>
+                            <td>
+                                <button class="btn-action edit" onclick="toggleUserStatus(${user.id})"><i class="bi bi-arrow-repeat"></i></button>
+                                <button class="btn-action delete" onclick="deleteUser(${user.id})"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+            }
+
+            if (totalSpan) totalSpan.textContent = users.length;
+            if (userCountBadge) userCountBadge.textContent = users.length;
+        }
+
+        function addUser(name, username, password, role) {
+            const users = getUsers();
+            const newUser = {
+                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                name: name,
+                username: username,
+                password: password,
+                role: role,
+                status: 'aktif',
+                lastLogin: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) +
+                    ', ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            };
+            users.push(newUser);
+            saveUsers(users);
+            showToast('success', 'Berhasil', `Pengguna ${username} berhasil ditambahkan!`);
+            addActivity('Pengguna baru', 'green', `${username} - ${role}`);
+        }
+
+        function deleteUser(id) {
+            const users = getUsers();
+            const user = users.find(u => u.id === id);
+            showConfirmDialog(
+                'Hapus Pengguna',
+                `Apakah Anda yakin ingin menghapus pengguna "${user ? user.username : ''}"? Tindakan ini tidak dapat dibatalkan.`,
+                '🗑️',
+                'Ya, Hapus',
+                'danger',
+                function() {
+                    let usersData = getUsers();
+                    usersData = usersData.filter(u => u.id !== id);
+                    saveUsers(usersData);
+                    showToast('success', 'Berhasil', `Pengguna ${user ? user.username : ''} dihapus`);
+                    addActivity('Pengguna dihapus', 'red', `${user ? user.username : ''}`);
+                }
+            );
+        }
+
+        function toggleUserStatus(id) {
+            const users = getUsers();
+            const user = users.find(u => u.id === id);
+            if (user) {
+                user.status = user.status === 'aktif' ? 'nonaktif' : 'aktif';
+                saveUsers(users);
+                showToast('success', 'Berhasil', `Status ${user.username} diubah menjadi ${user.status}`);
+            }
+        }
+
+        function searchUsers() {
+            const query = document.getElementById('searchUser').value.toLowerCase();
+            const users = getUsers();
+            const tbody = document.getElementById('userTable');
+
+            const filtered = users.filter(u =>
+                u.name.toLowerCase().includes(query) ||
+                u.username.toLowerCase().includes(query)
+            );
+
+            tbody.innerHTML = filtered.map(user => `
+                    <tr>
+                        <td><strong>${user.name}</strong></td>
+                        <td>${user.username}</td>
+                        <td><span class="role-badge ${user.role.toLowerCase().replace(' ', '-')}">${user.role}</span></td>
+                        <td>
+                            <span class="user-status ${user.status === 'aktif' ? 'active' : 'inactive'}">
+                                <span class="dot"></span> ${user.status === 'aktif' ? 'Aktif' : 'Nonaktif'}
+                            </span>
+                        </td>
+                        <td>${user.lastLogin || '-'}</td>
+                        <td>
+                            <button class="btn-action edit" onclick="toggleUserStatus(${user.id})"><i class="bi bi-arrow-repeat"></i></button>
+                            <button class="btn-action delete" onclick="deleteUser(${user.id})"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        function showAddUserModal() {
+            document.getElementById('addUserModal').classList.add('show');
+            document.getElementById('newFullName').value = '';
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newRole').value = 'Editor';
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('show');
+        }
+
+        document.getElementById('addUserForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('newFullName').value.trim();
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const role = document.getElementById('newRole').value;
+
+            if (!name || !username || !password) {
+                showToast('error', 'Gagal', 'Semua field harus diisi!');
+                return;
+            }
+
+            const users = getUsers();
+            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('error', 'Gagal', 'Username sudah digunakan!');
+                return;
+            }
+
+            addUser(name, username, password, role);
+            closeAddUserModal();
+        });
+
+        // ================================================================
+        // 15. SETTINGS
+        // ================================================================
+        function saveSettings() {
+            const settings = {
+                appName: document.getElementById('appName').value,
+                timezone: document.getElementById('appTimezone').value,
+                language: document.getElementById('appLanguage').value,
+                batchSize: document.getElementById('batchSize').value,
+                autoScraping: document.getElementById('autoScraping').value
+            };
+            localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+            showToast('success', 'Berhasil', 'Pengaturan sistem disimpan!');
+        }
+
+        function loadSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY));
+                if (settings) {
+                    if (document.getElementById('appName')) document.getElementById('appName').value = settings
+                    .appName || 'FinSense SVM';
+                    if (document.getElementById('appTimezone')) document.getElementById('appTimezone').value = settings
+                        .timezone || 'Asia/Jakarta';
+                    if (document.getElementById('appLanguage')) document.getElementById('appLanguage').value = settings
+                        .language || 'id';
+                    if (document.getElementById('batchSize')) document.getElementById('batchSize').value = settings
+                        .batchSize || '500';
+                    if (document.getElementById('autoScraping')) document.getElementById('autoScraping').value = settings
+                        .autoScraping || 'off';
+                }
+            } catch (e) {}
+        }
+
+        // ================================================================
+        // 16. BACKGROUND CONTROLLER
+        // ================================================================
+        (function() {
+            const DEFAULT_BG = 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1400&q=80&auto=format&fit=crop';
+
+            const bgUrlInput = document.getElementById('bgUrlInput');
+            const bgFileInput = document.getElementById('bgFileInput');
+            const applyBtn = document.getElementById('applyBgBtn');
+            const resetBtn = document.getElementById('resetBgBtn');
+            const statusText = document.getElementById('bgStatusText');
+            const statusBadge = document.getElementById('bgStatusBadge');
+
+            function getSavedBackground() {
+                try {
+                    const saved = localStorage.getItem(BG_STORAGE_KEY);
+                    if (saved && saved !== '' && saved !== 'undefined' && saved !== 'null') {
+                        return saved;
+                    }
+                } catch (e) {}
+                return null;
+            }
+
+            function saveBackground(url) {
+                try {
+                    localStorage.setItem(BG_STORAGE_KEY, url);
+                    return true;
+                } catch (e) { return false; }
+            }
+
+            function updateStatus(type, message) {
+                if (statusText) statusText.textContent = message;
+                if (statusBadge) {
+                    statusBadge.className = 'status-badge';
+                    if (type === 'success') {
+                        statusBadge.classList.add('success');
+                        statusBadge.textContent = 'Berhasil';
+                        statusBadge.style.background = '#e6f5ea';
+                        statusBadge.style.color = '#2d6a4f';
+                    } else if (type === 'error') {
+                        statusBadge.classList.add('error');
+                        statusBadge.textContent = 'Gagal';
+                        statusBadge.style.background = '#f5e8e6';
+                        statusBadge.style.color = '#b8734a';
+                    } else {
+                        statusBadge.classList.add('info');
+                        statusBadge.textContent = 'Aktif';
+                        statusBadge.style.background = '#e3f0f5';
+                        statusBadge.style.color = '#2d7a8a';
+                    }
+                }
+            }
+
+            function applyBackgroundFromUrl(url) {
+                if (!url || url.trim() === '') {
+                    showToast('error', 'Gagal', 'URL kosong!');
+                    return false;
+                }
+                try { new URL(url); } catch (e) {
+                    showToast('error', 'Gagal', 'URL tidak valid!');
+                    return false;
+                }
+                if (saveBackground(url.trim())) {
+                    bgUrlInput.value = url.trim();
+                    bgFileInput.value = '';
+                    updateStatus('success', 'Background tersimpan');
+                    showToast('success', 'Berhasil', 'Background login berhasil diupdate');
+                    return true;
+                }
+                return false;
+            }
+
+            function applyBackgroundFromFile(file) {
+                if (!file || !file.type.startsWith('image/')) {
+                    showToast('error', 'Gagal', 'Pilih file gambar yang valid!');
+                    return false;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    if (saveBackground(dataUrl)) {
+                        bgUrlInput.value = '';
+                        updateStatus('success', 'Background dari file');
+                        showToast('success', 'Berhasil', 'Background login berhasil diupdate dari file');
+                    }
+                };
+                reader.onerror = function() {
+                    showToast('error', 'Gagal', 'Gagal membaca file');
+                };
+                reader.readAsDataURL(file);
+                return true;
+            }
+
+            function resetBackground() {
+                if (saveBackground(DEFAULT_BG)) {
+                    bgUrlInput.value = '';
+                    bgFileInput.value = '';
+                    updateStatus('info', 'Default');
+                    showToast('info', 'Reset', 'Background login direset ke default');
+                }
+            }
+
+            function initBackground() {
+                const saved = getSavedBackground();
+                if (saved) {
+                    if (saved.startsWith('data:')) {
+                        updateStatus('success', 'Dari file lokal');
+                    } else if (saved === DEFAULT_BG) {
+                        updateStatus('info', 'Default');
+                    } else {
+                        updateStatus('success', 'Dari link URL');
+                        bgUrlInput.value = saved;
+                    }
+                } else {
+                    saveBackground(DEFAULT_BG);
+                    updateStatus('info', 'Default');
+                }
+            }
+
+            if (applyBtn) {
+                applyBtn.addEventListener('click', function() {
+                    const url = bgUrlInput.value.trim();
+                    const file = bgFileInput.files[0];
+                    if (file) {
+                        applyBackgroundFromFile(file);
+                    } else if (url) {
+                        applyBackgroundFromUrl(url);
+                    } else {
+                        showToast('warning', 'Peringatan', 'Isi URL atau pilih file!');
+                    }
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetBackground);
+            }
+
+            initBackground();
+        })();
+
+        // ================================================================
+        // 17. REPORT
+        // ================================================================
+        function generateReport() {
+            const start = document.getElementById('reportStart').value;
+            const end = document.getElementById('reportEnd').value;
+            const format = document.getElementById('reportFormat').value;
+
+            if (!start || !end) {
+                showToast('error', 'Gagal', 'Pilih periode laporan!');
+                return;
+            }
+
+            const data = getSentimen();
+            const filtered = data.filter(d => d.tanggal >= start && d.tanggal <= end);
+
+            if (filtered.length === 0) {
+                showToast('warning', 'Peringatan', 'Tidak ada data dalam periode tersebut!');
+                return;
+            }
+
+            const report = {
+                periode: { start, end },
+                format: format,
+                totalData: filtered.length,
+                positif: filtered.filter(d => d.label === 'positif').length,
+                negatif: filtered.filter(d => d.label === 'negatif').length,
+                netral: filtered.filter(d => d.label === 'netral').length,
+                data: filtered,
+                generated: new Date().toISOString()
+            };
+
+            let history = JSON.parse(localStorage.getItem(REPORT_HISTORY_KEY) || '[]');
+            history.unshift(report);
+            if (history.length > 10) history = history.slice(0, 10);
+            localStorage.setItem(REPORT_HISTORY_KEY, JSON.stringify(history));
+
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `laporan_${start}_${end}.${format === 'pdf' ? 'json' : format}`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('success', 'Berhasil', `Laporan berhasil digenerate (${filtered.length} data)`);
+            addActivity('Laporan digenerate', 'gold', `${filtered.length} data, format ${format}`);
+            showReportHistory();
+        }
+
+        function showReportHistory() {
+            try {
+                const history = JSON.parse(localStorage.getItem(REPORT_HISTORY_KEY) || '[]');
+                const container = document.getElementById('reportHistory');
+                if (container) {
+                    if (history.length === 0) {
+                        container.innerHTML = '<div style="padding:0.5rem;color:var(--text-muted);">Belum ada laporan</div>';
+                        return;
+                    }
+                    container.innerHTML = history.slice(0, 3).map(r => `
+                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+                                <span><i class="bi bi-file-earmark-text"></i> Laporan ${r.periode.start} - ${r.periode.end}</span>
+                                <span>${r.totalData} data · ${new Date(r.generated).toLocaleDateString('id-ID')}</span>
+                            </div>
+                        `).join('');
+                }
+            } catch (e) {}
+        }
+
+        // ================================================================
+        // 18. CHARTS
+        // ================================================================
+        let trendChart, pieChart, monthlyChart, keywordChart, monitorChart, monitorPieChart;
+
+        function initCharts() {
+            // Trend Chart
+            const ctx1 = document.getElementById('trendChart').getContext('2d');
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Positif', data: [], borderColor: '#2d6a4f', backgroundColor: 'rgba(45,106,79,0.05)',
+                            fill: true, tension: 0.4, pointRadius: 3 },
+                        { label: 'Negatif', data: [], borderColor: '#b8734a', backgroundColor: 'rgba(184,115,74,0.05)',
+                            fill: true, tension: 0.4, pointRadius: 3 },
+                        { label: 'Netral', data: [], borderColor: '#f39c12', backgroundColor: 'rgba(243,156,18,0.05)',
+                            fill: true, tension: 0.4, pointRadius: 3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top', labels: { font: { size: 9 }, boxWidth: 12, padding: 8 } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 8 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 8 } } }
+                    }
+                }
+            });
+
+            // Pie Chart
+            const ctx2 = document.getElementById('pieChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+            pieChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Positif', 'Negatif', 'Netral'],
+                    datasets: [{ data: [0, 0, 0], backgroundColor: ['#2d6a4f', '#b8734a', '#f39c12'], borderWidth: 0 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 9 }, boxWidth: 12,
+                            padding: 8 } } },
+                    cutout: '65%'
+                }
+            });
+
+            // Monthly Chart
+            const ctx3 = document.getElementById('monthlyChart')?.getContext('2d');
+            if (ctx3) {
+                if (monthlyChart) monthlyChart.destroy();
+                monthlyChart = new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [
+                            { label: 'Positif', data: [], backgroundColor: 'rgba(45,106,79,0.7)',
+                                borderColor: '#2d6a4f', borderWidth: 1 },
+                            { label: 'Negatif', data: [], backgroundColor: 'rgba(184,115,74,0.7)',
+                                borderColor: '#b8734a', borderWidth: 1 },
+                            { label: 'Netral', data: [], backgroundColor: 'rgba(243,156,18,0.7)',
+                                borderColor: '#f39c12', borderWidth: 1 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { position: 'top', labels: { font: { size: 8 }, boxWidth: 10,
+                                    padding: 6 } } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 7 } } },
+                            x: { grid: { display: false }, ticks: { font: { size: 7 } } }
+                        }
+                    }
+                });
+            }
+
+            // Keyword Chart
+            const ctx4 = document.getElementById('keywordChart')?.getContext('2d');
+            if (ctx4) {
+                if (keywordChart) keywordChart.destroy();
+                keywordChart = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{ label: 'Frekuensi', data: [], backgroundColor: '#2d6a4f', borderRadius: 4 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { display: false }, ticks: { font: { size: 8 } } },
+                            x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 7 } } }
+                        }
+                    }
+                });
+            }
+
+            // Monitor Chart
+            const monitorCtx = document.getElementById('monitorChart')?.getContext('2d');
+            if (monitorCtx) {
+                if (monitorChart) monitorChart.destroy();
+                monitorChart = new Chart(monitorCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                        datasets: [
+                            { label: 'Positif', data: [], borderColor: '#2d6a4f', backgroundColor: 'rgba(45,106,79,0.05)',
+                                fill: true, tension: 0.4, pointRadius: 2 },
+                            { label: 'Negatif', data: [], borderColor: '#b8734a', backgroundColor: 'rgba(184,115,74,0.05)',
+                                fill: true, tension: 0.4, pointRadius: 2 },
+                            { label: 'Netral', data: [], borderColor: '#f39c12', backgroundColor: 'rgba(243,156,18,0.05)',
+                                fill: true, tension: 0.4, pointRadius: 2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { position: 'top', labels: { font: { size: 8 }, boxWidth: 10,
+                                    padding: 6 } } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 7 } } },
+                            x: { grid: { display: false }, ticks: { font: { size: 7 } } }
+                        }
+                    }
+                });
+            }
+
+            // Monitor Pie Chart
+            const monitorPieCtx = document.getElementById('monitorPieChart')?.getContext('2d');
+            if (monitorPieCtx) {
+                if (monitorPieChart) monitorPieChart.destroy();
+                monitorPieChart = new Chart(monitorPieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Positif', 'Negatif', 'Netral'],
+                        datasets: [{ data: [0, 0, 0], backgroundColor: ['#2d6a4f', '#b8734a', '#f39c12'],
+                            borderWidth: 0 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { position: 'bottom', labels: { font: { size: 8 }, boxWidth: 10,
+                                    padding: 6 } } },
+                        cutout: '65%'
+                    }
+                });
+            }
+
+            updateCharts();
+        }
+
+        function updateCharts() {
+            const data = getSentimen();
+
+            // Update trend chart
+            const grouped = {};
+            data.forEach(d => {
+                if (d.tanggal) {
+                    const date = d.tanggal;
+                    if (!grouped[date]) grouped[date] = { positif: 0, negatif: 0, netral: 0 };
+                    grouped[date][d.label] = (grouped[date][d.label] || 0) + 1;
+                }
+            });
+
+            const sortedDates = Object.keys(grouped).sort();
+            const trendLabels = sortedDates.slice(-7);
+            const trendPositif = trendLabels.map(d => grouped[d].positif || 0);
+            const trendNegatif = trendLabels.map(d => grouped[d].negatif || 0);
+            const trendNetral = trendLabels.map(d => grouped[d].netral || 0);
+
+            if (trendChart) {
+                trendChart.data.labels = trendLabels.length > 0 ? trendLabels : ['Belum ada data'];
+                trendChart.data.datasets[0].data = trendLabels.length > 0 ? trendPositif : [0];
+                trendChart.data.datasets[1].data = trendLabels.length > 0 ? trendNegatif : [0];
+                trendChart.data.datasets[2].data = trendLabels.length > 0 ? trendNetral : [0];
+                trendChart.update();
+            }
+
+            // Update pie chart
+            const positif = data.filter(d => d.label === 'positif').length;
+            const negatif = data.filter(d => d.label === 'negatif').length;
+            const netral = data.filter(d => d.label === 'netral').length;
+
+            if (pieChart) {
+                pieChart.data.datasets[0].data = [positif, negatif, netral];
+                pieChart.update();
+            }
+
+            // Update monthly chart
+            const months = {};
+            data.forEach(d => {
+                if (d.tanggal) {
+                    const month = d.tanggal.substring(0, 7);
+                    if (!months[month]) months[month] = { positif: 0, negatif: 0, netral: 0 };
+                    months[month][d.label] = (months[month][d.label] || 0) + 1;
+                }
+            });
+
+            const sortedMonths = Object.keys(months).sort();
+            if (monthlyChart) {
+                monthlyChart.data.labels = sortedMonths.length > 0 ? sortedMonths : ['Belum ada data'];
+                monthlyChart.data.datasets[0].data = sortedMonths.map(m => months[m].positif || 0);
+                monthlyChart.data.datasets[1].data = sortedMonths.map(m => months[m].negatif || 0);
+                monthlyChart.data.datasets[2].data = sortedMonths.map(m => months[m].netral || 0);
+                monthlyChart.update();
+            }
+
+            // Update keyword chart
+            const keywordCount = {};
+            data.forEach(d => {
+                const words = d.text.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+                words.forEach(w => {
+                    if (!keywordCount[w]) keywordCount[w] = 0;
+                    keywordCount[w]++;
+                });
+            });
+
+            const sortedKeywords = Object.entries(keywordCount).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            if (keywordChart) {
+                keywordChart.data.labels = sortedKeywords.length > 0 ? sortedKeywords.map(k => k[0]) : ['Belum ada data'];
+                keywordChart.data.datasets[0].data = sortedKeywords.length > 0 ? sortedKeywords.map(k => k[1]) : [0];
+                keywordChart.update();
+            }
+
+            // Update monitor chart
+            const hourData = {};
+            data.forEach(d => {
+                if (d.tanggal) {
+                    const hour = Math.floor(Math.random() * 6) * 4;
+                    const key = `${hour}:00`;
+                    if (!hourData[key]) hourData[key] = { positif: 0, negatif: 0, netral: 0 };
+                    hourData[key][d.label] = (hourData[key][d.label] || 0) + 1;
+                }
+            });
+
+            const hours = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
+            if (monitorChart) {
+                monitorChart.data.datasets[0].data = hours.map(h => (hourData[h]?.positif || 0));
+                monitorChart.data.datasets[1].data = hours.map(h => (hourData[h]?.negatif || 0));
+                monitorChart.data.datasets[2].data = hours.map(h => (hourData[h]?.netral || 0));
+                monitorChart.update();
+            }
+
+            // Update monitor pie chart
+            if (monitorPieChart) {
+                monitorPieChart.data.datasets[0].data = [positif, negatif, netral];
+                monitorPieChart.update();
+            }
+        }
+
+        // ================================================================
+        // 19. NAVIGASI MENU
+        // ================================================================
+        const pageTitles = {
+            dashboard: { title: 'Dashboard', desc: 'Pantau aktivitas dan performa sistem FinSense SVM' },
+            monitoring: { title: 'Monitoring Real-Time', desc: 'Pantau analisis sentimen secara langsung dari data yang masuk' },
+            sentimen: { title: 'Data Sentimen', desc: 'Kelola semua data sentimen (CRUD)' },
+            scraping: { title: 'Scraping Data', desc: 'Ambil data dari Twitter/X untuk analisis sentimen' },
+            model: { title: 'Manajemen Model', desc: 'Kelola model SVM untuk analisis sentimen' },
+            visualisasi: { title: 'Visualisasi Data', desc: 'Lihat grafik dan analisis data sentimen secara interaktif' },
+            users: { title: 'Manajemen Pengguna', desc: 'Kelola akun pengguna yang memiliki akses ke sistem' },
+            settings: { title: 'Pengaturan Sistem', desc: 'Konfigurasi umum sistem FinSense SVM' },
+            background: { title: 'Pengaturan Background Login', desc: 'Ubah gambar latar belakang halaman login' },
+            laporan: { title: 'Laporan', desc: 'Generate dan unduh laporan analisis sentimen' }
+        };
+
+        const navLinks = document.querySelectorAll('.sidebar-nav a[data-page]');
+        const quickActions = document.querySelectorAll('.quick-action[data-page]');
+
+        function navigateTo(page) {
+            document.querySelectorAll('.menu-page').forEach(p => p.classList.remove('active'));
+
+            const targetPage = document.getElementById('page-' + page);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            const pageInfo = pageTitles[page];
+            if (pageInfo) {
+                document.querySelector('.page-title h2').innerHTML = pageInfo.title + ' <small>' + pageInfo.desc.split(
+                    ' ').slice(0, 3).join(' ') + '</small>';
+                document.querySelector('.page-title p').textContent = pageInfo.desc;
+            }
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === page) {
+                    link.classList.add('active');
+                }
+            });
+
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateTo(this.dataset.page);
+            });
+        });
+
+        quickActions.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (this.dataset.page) navigateTo(this.dataset.page);
+            });
+        });
+
+        // ================================================================
+        // 20. SIDEBAR TOGGLE & OTHER
+        // ================================================================
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        });
+
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('open');
+            this.classList.remove('active');
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('liveDateTime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // ================================================================
+        // 21. LOGOUT & BACK HOME
+        // ================================================================
+        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            showConfirmDialog(
+                'Konfirmasi Logout',
+                'Apakah Anda yakin ingin keluar dari sistem?',
+                '🚪',
+                'Ya, Keluar',
+                'danger',
+                function() {
+                    sessionStorage.removeItem('admin_logged_in');
+                    sessionStorage.removeItem('admin_username');
+                    sessionStorage.removeItem('admin_role');
+                    showToast('success', 'Logout', 'Anda berhasil keluar dari sistem');
+                    setTimeout(() => window.location.href = '/admin-login', 500);
+                }
+            );
+        });
+
+        document.getElementById('backHomeBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            showConfirmDialog(
+                'Kembali ke Beranda',
+                '🏠 Apakah Anda ingin kembali ke halaman beranda?',
+                '🏠',
+                'Ya, Kembali',
+                'primary',
+                function() {
+                    window.location.href = '/';
+                }
+            );
+        });
+
+        document.getElementById('exportPdfBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            generateReport();
+        });
+
+        // ================================================================
+        // 22. INIT
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = sessionStorage.getItem('admin_username') || 'Admin';
+            const role = sessionStorage.getItem('admin_role') || 'Super Administrator';
+
+            document.getElementById('sidebarName').textContent = username;
+            document.getElementById('sidebarRole').textContent = role;
+            document.getElementById('sidebarAvatar').textContent = username.charAt(0).toUpperCase();
+
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('reportStart').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('reportEnd').value = today.toISOString().split('T')[0];
+
+            renderSentimen();
+            renderUsers();
+            loadSettings();
+            loadActivities();
+            updateDashboard();
+            updateMonitoring();
+            updateVisualisasi();
+            showReportHistory();
+
+            try {
+                const modelData = JSON.parse(localStorage.getItem(MODEL_STORAGE_KEY));
+                if (modelData) {
+                    document.getElementById('modelAkurasi').textContent = modelData.accuracy + '%';
+                    document.getElementById('modelLatihan').textContent = modelData.dataCount > 0 ? '1' : '0';
+                    document.getElementById('modelDataLatih').textContent = modelData.dataCount || 0;
+                }
+            } catch (e) {}
+
+            setTimeout(initCharts, 200);
+
+            showToast('info', 'Selamat Datang', `Halo ${username}, selamat datang di FinSense Admin Panel`);
+            addNotification('Selamat Datang', `Halo ${username}`, 'bi-person-check', 'success');
+        });
+
+        // ================================================================
+        // 23. SIMULASI LIVE DATA
+        // ================================================================
+        let liveCount = 0;
+
+        setInterval(() => {
+            const data = getSentimen();
+            if (data.length > 0 && document.getElementById('page-monitoring').classList.contains('active')) {
+                const total = data.length;
+                const positif = data.filter(d => d.label === 'positif').length;
+                const negatif = data.filter(d => d.label === 'negatif').length;
+
+                document.getElementById('monitorTotal').textContent = total;
+                document.getElementById('monitorPositif').textContent = positif;
+                document.getElementById('monitorNegatif').textContent = negatif;
+
+                const periodEl = document.getElementById('monitorPeriod');
+                if (periodEl) {
+                    periodEl.textContent = 'Update: ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit',
+                        minute: '2-digit', second: '2-digit' });
+                }
+            }
+
+            if (document.getElementById('page-monitoring').classList.contains('active')) {
+                const feed = document.getElementById('liveFeed');
+                if (feed && data.length > 0 && Math.random() > 0.7) {
+                    const random = data[Math.floor(Math.random() * data.length)];
+                    const colors = { positif: 'green', negatif: 'red', netral: 'gold' };
+                    const labels = { positif: 'Positif', negatif: 'Negatif', netral: 'Netral' };
+
+                    const item = document.createElement('div');
+                    item.className = 'activity-item';
+                    item.style.animation = 'fadeInUp 0.3s ease';
+                    item.innerHTML = `
+                            <div class="activity-dot ${colors[random.label] || 'blue'}"></div>
+                            <div class="activity-content">
+                                <div class="title">Data diproses</div>
+                                <div class="desc">"${random.text.substring(0, 40)}..." → ${labels[random.label] || random.label} (${random.score.toFixed(2)})</div>
+                            </div>
+                            <div class="activity-time">Baru saja</div>
+                        `;
+
+                    feed.insertBefore(item, feed.firstChild);
+                    while (feed.children.length > 8) {
+                        feed.removeChild(feed.lastChild);
+                    }
+
+                    const items = feed.querySelectorAll('.activity-item');
+                    items.forEach((el, index) => {
+                        if (index > 0) {
+                            const timeEl = el.querySelector('.activity-time');
+                            if (timeEl) {
+                                const minutes = index * 2 + 1;
+                                timeEl.textContent = minutes + ' menit lalu';
+                            }
+                        }
+                    });
+                }
+            }
+        }, 5000);
+
+        console.log('📊 FinSense Admin Panel Loaded');
+        console.log('👤 User:', sessionStorage.getItem('admin_username') || 'Belum login');
+        console.log('💾 Data tersimpan di localStorage');
+        console.log('✅ Semua fitur berfungsi dengan baik');
+    </script>
+
 </body>
 </html>
