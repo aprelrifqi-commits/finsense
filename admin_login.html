@@ -1,174 +1,679 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login · FinSense SVM</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login · FinSense SVM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        /* ================================================================
+           RESET & FONT
+           ================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
-    background: linear-gradient(135deg, #2d5a4a 0%, #1e4a3a 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: #e8e4de;
+        }
 
-.login-container {
-    background: #fffdf9;
-    border-radius: 24px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 400px;
-    margin: 1rem;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
+        /* ================================================================
+           BACKGROUND WRAPPER — LEBIH TERANG & BLUR HALUS
+           ================================================================ */
+        .background-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
 
-.logo {
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
+        .background-wrapper .bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(4px) brightness(0.85) saturate(1.1);
+            transform: scale(1.04);
+            transition: all 0.5s ease;
+        }
 
-.logo-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #2d5a4a, #c9a03d);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 0.8rem;
-}
+        .background-wrapper .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 60% 30%, rgba(255, 255, 255, 0.15) 0%, rgba(200, 195, 185, 0.20) 90%);
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
 
-.logo-icon i {
-    font-size: 1.8rem;
-    color: white;
-}
+        /* ================================================================
+           LOGIN CONTAINER — GLASSMORPHISM LEBIH TERANG
+           ================================================================ */
+        .login-container {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-radius: 28px;
+            padding: 2.4rem 2.6rem 2rem;
+            width: 100%;
+            max-width: 390px;
+            margin: 1.2rem;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3);
+            animation: fadeSlide 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.25s ease, box-shadow 0.35s ease;
+        }
 
-.logo h2 {
-    font-size: 1.3rem;
-    color: #2d5a4a;
-}
+        .login-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.20), 0 0 0 1px rgba(255, 255, 255, 0.4);
+        }
 
-.logo h2 span {
-    color: #c9a03d;
-}
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(28px) scale(0.96);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-.logo p {
-    font-size: 0.7rem;
-    color: #7a7a72;
-}
+        /* ================================================================
+           LOGO & HEADER
+           ================================================================ */
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-.form-group {
-    margin-bottom: 1rem;
-}
+        .logo-icon {
+            width: 68px;
+            height: 68px;
+            background: linear-gradient(145deg, #2d5a4a, #1f3f34);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.9rem;
+            box-shadow: 0 10px 28px rgba(45, 90, 74, 0.20);
+            transition: all 0.3s ease;
+        }
 
-.form-group label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #2a2a26;
-    margin-bottom: 0.3rem;
-}
+        .logo-icon:hover {
+            transform: scale(1.04) rotate(-2deg);
+            box-shadow: 0 14px 36px rgba(45, 90, 74, 0.30);
+        }
 
-.form-group input {
-    width: 100%;
-    padding: 0.7rem;
-    border: 1px solid #e0d9cf;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    transition: 0.2s;
-}
+        .logo-icon i {
+            font-size: 2.1rem;
+            color: #f5efe6;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.10));
+        }
 
-.form-group input:focus {
-    outline: none;
-    border-color: #c9a03d;
-    box-shadow: 0 0 0 2px rgba(201,160,61,0.2);
-}
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #1e2a26;
+        }
 
-.btn-login {
-    width: 100%;
-    background: #2d5a4a;
-    color: white;
-    border: none;
-    padding: 0.7rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-    margin-top: 0.5rem;
-}
+        .logo h2 span {
+            background: linear-gradient(135deg, #c9a03d, #a8802e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-.btn-login:hover {
-    background: #1e4a3a;
-    transform: translateY(-2px);
-}
+        .logo .sub {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #6b7f74;
+            margin-top: 0.2rem;
+            letter-spacing: 0.3px;
+            background: rgba(201, 160, 61, 0.06);
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
 
-.error-message {
-    background: #f8d7da;
-    color: #b8734a;
-    padding: 0.5rem;
-    border-radius: 10px;
-    font-size: 0.7rem;
-    text-align: center;
-    margin-bottom: 1rem;
-}
+        /* ================================================================
+           FORM
+           ================================================================ */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
 
-.footer {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.6rem;
-    color: #7a7a72;
-}
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #3d4d44;
+            letter-spacing: 0.02em;
+            margin-bottom: 0.3rem;
+        }
 
-.footer a {
-    color: #2d5a4a;
-    text-decoration: none;
-}
-</style>
+        .form-group label i {
+            color: #b18a3a;
+            font-size: 0.8rem;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid rgba(180, 180, 170, 0.2);
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            transition: all 0.25s ease;
+            color: #1c2621;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .input-wrap input:focus {
+            outline: none;
+            border-color: #b18a3a;
+            box-shadow: 0 0 0 4px rgba(201, 160, 61, 0.08), inset 0 1px 3px rgba(0, 0, 0, 0.02);
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .input-wrap input::placeholder {
+            color: #9faaa3;
+            font-weight: 400;
+            font-size: 0.8rem;
+        }
+
+        /* ================================================================
+           TOMBOL LOGIN
+           ================================================================ */
+        .btn-login {
+            width: 100%;
+            background: #2d5a4a;
+            color: white;
+            border: none;
+            padding: 0.85rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 0.4rem;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 18px rgba(45, 90, 74, 0.25);
+        }
+
+        .btn-login i {
+            font-size: 1.1rem;
+        }
+
+        .btn-login:hover {
+            background: #1e4a3a;
+            transform: scale(1.01) translateY(-2px);
+            box-shadow: 0 12px 36px rgba(45, 90, 74, 0.35);
+        }
+
+        .btn-login:active {
+            transform: scale(0.98) translateY(0);
+            box-shadow: 0 4px 12px rgba(45, 90, 74, 0.20);
+        }
+
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .btn-login:hover::after {
+            opacity: 1;
+        }
+
+        /* ================================================================
+           ERROR MESSAGE
+           ================================================================ */
+        .error-message {
+            background: rgba(200, 70, 50, 0.04);
+            backdrop-filter: blur(6px);
+            color: #b25a42;
+            padding: 0.6rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(200, 70, 50, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .error-message.hidden {
+            display: none;
+        }
+
+        .error-message:not(.hidden) {
+            display: flex;
+            animation: shakeFade 0.5s ease;
+        }
+
+        @keyframes shakeFade {
+            0%,
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            20% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            60% {
+                transform: translateX(-4px);
+            }
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        .error-message i {
+            font-size: 0.8rem;
+            color: #b8734a;
+        }
+
+        /* ================================================================
+           FORM EXTRA: REMEMBER ME & TOGGLE PASSWORD
+           ================================================================ */
+        .form-extra {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.2rem 0 0.6rem 0;
+            font-size: 0.7rem;
+            color: #4b5a52;
+        }
+
+        .form-extra label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #3d4d44;
+        }
+
+        .form-extra label input[type="checkbox"] {
+            accent-color: #2d5a4a;
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .toggle-pw {
+            background: none;
+            border: none;
+            color: #6b7f74;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 30px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .toggle-pw:hover {
+            color: #1e3f35;
+            background: rgba(30, 63, 53, 0.05);
+        }
+
+        .toggle-pw i {
+            font-size: 0.9rem;
+        }
+
+        /* ================================================================
+           FOOTER
+           ================================================================ */
+        .footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #5d6b64;
+        }
+
+        .footer a {
+            color: #1e3f35;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.7rem;
+            border-radius: 40px;
+            background: rgba(30, 63, 53, 0.03);
+        }
+
+        .footer a:hover {
+            color: #b18a3a;
+            background: rgba(201, 160, 61, 0.07);
+        }
+
+        .footer .sep {
+            color: #bcc8c0;
+            user-select: none;
+        }
+
+        /* ================================================================
+           RESPONSIVE
+           ================================================================ */
+        @media (max-width: 440px) {
+            .login-container {
+                padding: 1.8rem 1.4rem 1.6rem;
+                max-width: 94%;
+                border-radius: 24px;
+            }
+            .logo-icon {
+                width: 56px;
+                height: 56px;
+            }
+            .logo-icon i {
+                font-size: 1.6rem;
+            }
+            .logo h2 {
+                font-size: 1.2rem;
+            }
+            .input-wrap input {
+                padding: 0.65rem 0.9rem;
+                font-size: 0.85rem;
+            }
+            .btn-login {
+                padding: 0.7rem;
+                font-size: 0.85rem;
+            }
+            .form-extra {
+                flex-wrap: wrap;
+                gap: 0.2rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .login-container {
+                padding: 1.4rem 1rem 1.2rem;
+                border-radius: 20px;
+            }
+            .footer {
+                gap: 0.3rem;
+            }
+            .footer a {
+                padding: 0.1rem 0.5rem;
+                font-size: 0.6rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="login-container">
-    <div class="logo">
-        <div class="logo-icon">
-            <i class="bi bi-shield-lock-fill"></i>
-        </div>
-        <h2>Fin<span>Sense</span> Admin</h2>
-        <p>Masuk untuk mengelola konten</p>
+
+    <!-- ================================================================
+    BACKGROUND — LEBIH TERANG & BLUR HALUS
+    ================================================================ -->
+    <div class="background-wrapper" id="bgWrapper">
+        <img class="bg-image" id="bgImage" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1400&q=80&auto=format&fit=crop" alt="Background" />
+        <div class="overlay"></div>
     </div>
-    
-    {% if error %}
-    <div class="error-message">
-        <i class="bi bi-exclamation-triangle"></i> {{ error }}
-    </div>
-    {% endif %}
-    
-    <form method="POST">
-        <div class="form-group">
-            <label><i class="bi bi-person"></i> Username</label>
-            <input type="text" name="username" placeholder="admin" required autofocus>
+
+    <!-- ================================================================
+    LOGIN CONTAINER
+    ================================================================ -->
+    <div class="login-container">
+
+        <!-- LOGO -->
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h2>Fin<span>Sense</span> SVM</h2>
+            <div class="sub"><i class="bi bi-grid-3x3-gap-fill"></i> Admin Panel</div>
         </div>
-        <div class="form-group">
-            <label><i class="bi bi-key"></i> Password</label>
-            <input type="password" name="password" placeholder="••••••" required>
+
+        <!-- ERROR MESSAGE -->
+        {% if error %}
+        <div class="error-message">
+            <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
         </div>
-        <button type="submit" class="btn-login">
-            <i class="bi bi-box-arrow-in-right"></i> Masuk
-        </button>
-    </form>
-    
-    <div class="footer">
-        <p>Demo: username <strong>admin</strong> | password <strong>admin123</strong></p>
-        <p><a href="/">← Kembali ke Beranda</a></p>
+        {% else %}
+        <div class="error-message hidden" id="jsError">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span id="errorText"></span>
+        </div>
+        {% endif %}
+
+        <!-- FORM LOGIN -->
+        <form method="POST" action="/admin-login" id="loginForm">
+            <div class="form-group">
+                <label><i class="bi bi-person-circle"></i> Username</label>
+                <div class="input-wrap">
+                    <input type="text" name="username" placeholder="Masukkan username" required autofocus />
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-key-fill"></i> Password</label>
+                <div class="input-wrap" style="position:relative;">
+                    <input type="password" name="password" id="passwordInput" placeholder="Masukkan password" required />
+                </div>
+            </div>
+
+            <!-- EXTRA: Remember Me & Toggle Password -->
+            <div class="form-extra">
+                <label>
+                    <input type="checkbox" name="remember" value="1" />
+                    <span>Ingat saya</span>
+                </label>
+                <button type="button" class="toggle-pw" id="togglePasswordBtn">
+                    <i class="bi bi-eye" id="pwIcon"></i> <span id="pwLabel">Tampilkan</span>
+                </button>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="bi bi-box-arrow-in-right"></i> Masuk
+            </button>
+        </form>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <a href="/"><i class="bi bi-arrow-left"></i> Beranda</a>
+            <span class="sep">•</span>
+            <a href="#" onclick="event.preventDefault();"><i class="bi bi-question-circle"></i> Bantuan</a>
+            <span class="sep">•</span>
+            <a href="#" onclick="event.preventDefault();"><i class="bi bi-envelope"></i> Kontak</a>
+        </div>
     </div>
-</div>
+
+    <!-- ================================================================
+    SCRIPT
+    ================================================================ -->
+    <script>
+        // ================================================================
+        // 1. BACKGROUND CONTROLLER — AMBIL DARI LOCALSTORAGE
+        //    (Terintegrasi dengan pengaturan dari admin panel)
+        // ================================================================
+        (function() {
+            const BG_STORAGE_KEY = 'finsense_login_background';
+            const DEFAULT_BG = 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1400&q=80&auto=format&fit=crop';
+
+            const bgImage = document.getElementById('bgImage');
+
+            function getSavedBackground() {
+                try {
+                    const saved = localStorage.getItem(BG_STORAGE_KEY);
+                    if (saved && saved !== '' && saved !== 'undefined' && saved !== 'null') {
+                        return saved;
+                    }
+                } catch (e) {
+                    console.warn('Gagal membaca localStorage:', e);
+                }
+                return null;
+            }
+
+            function setBackground(url) {
+                if (!url || url === '') {
+                    url = DEFAULT_BG;
+                }
+                bgImage.src = url;
+                bgImage.onerror = function() {
+                    console.warn('Gagal memuat background, menggunakan default');
+                    this.src = DEFAULT_BG;
+                };
+            }
+
+            // Inisialisasi background
+            const savedBg = getSavedBackground();
+            if (savedBg) {
+                setBackground(savedBg);
+                console.log('🖼️ Background login dimuat dari localStorage');
+            } else {
+                setBackground(DEFAULT_BG);
+                console.log('🖼️ Background login menggunakan default');
+            }
+
+            // Expose fungsi untuk diakses dari console (debug)
+            window.getLoginBackground = function() {
+                return getSavedBackground() || DEFAULT_BG;
+            };
+
+            window.resetLoginBackground = function() {
+                localStorage.removeItem(BG_STORAGE_KEY);
+                setBackground(DEFAULT_BG);
+                console.log('🔄 Background login direset ke default');
+            };
+
+            console.log('📌 Gunakan getLoginBackground() untuk melihat background saat ini');
+            console.log('📌 Gunakan resetLoginBackground() untuk mereset ke default');
+        })();
+
+        // ================================================================
+        // 2. HAPUS SESSION STORAGE (sesuai permintaan)
+        // ================================================================
+        sessionStorage.removeItem('admin_logged_in');
+        sessionStorage.removeItem('admin_username');
+
+        // ================================================================
+        // 3. REFERENSI ELEMEN
+        // ================================================================
+        const errorBox = document.getElementById('jsError');
+        const errorText = document.getElementById('errorText');
+        const pwInput = document.getElementById('passwordInput');
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const pwIcon = document.getElementById('pwIcon');
+        const pwLabel = document.getElementById('pwLabel');
+
+        // ================================================================
+        // 4. HIDE ERROR SERVER OTOMATIS (jika ada)
+        // ================================================================
+        const serverError = document.querySelector('.error-message:not(.hidden)');
+        if (serverError && serverError.id !== 'jsError') {
+            setTimeout(() => {
+                serverError.classList.add('hidden');
+            }, 5000);
+        }
+
+        // ================================================================
+        // 5. TOGGLE PASSWORD
+        // ================================================================
+        let pwVisible = false;
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            pwVisible = !pwVisible;
+            pwInput.type = pwVisible ? 'text' : 'password';
+            pwIcon.className = pwVisible ? 'bi bi-eye-slash' : 'bi bi-eye';
+            pwLabel.textContent = pwVisible ? 'Sembunyikan' : 'Tampilkan';
+        });
+
+        // ================================================================
+        // 6. VALIDASI FORM SISI KLIEN
+        // ================================================================
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', function(e) {
+            const username = form.querySelector('input[name="username"]').value.trim();
+            const password = form.querySelector('input[name="password"]').value.trim();
+
+            if (!username || !password) {
+                e.preventDefault();
+                showError('Username dan password harus diisi.');
+                return;
+            }
+
+            // Jika login berhasil, sessionStorage akan diisi oleh backend
+            console.log('🔐 Mencoba login sebagai:', username);
+        });
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorBox.classList.remove('hidden');
+            setTimeout(() => {
+                errorBox.classList.add('hidden');
+            }, 4500);
+        }
+
+        // ================================================================
+        // 7. LOG CONSOLE
+        // ================================================================
+        console.log('🔐 Halaman Login Admin FinSense SVM');
+        console.log('📝 Username: admin');
+        console.log('🔑 Password: admin123');
+        console.log('🖼️ Background lebih terang dengan blur halus');
+        console.log('💡 Gunakan akun admin/admin123 untuk login');
+    </script>
+
 </body>
 </html>
