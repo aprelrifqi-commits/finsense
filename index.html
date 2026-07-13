@@ -25,7 +25,6 @@ body {
     color: #2a2a26;
 }
 
-/* WARNA NATURAL */
 :root {
     --bg: #ede8df;
     --card: #fefcf8;
@@ -58,7 +57,6 @@ body {
     transition: background 0.3s, color 0.3s;
 }
 
-/* NAVBAR */
 .navbar {
     background: var(--card);
     border-bottom: 1px solid var(--border);
@@ -145,6 +143,7 @@ body {
     transition: all 0.2s ease;
     cursor: pointer;
     text-decoration: none;
+    display: inline-block;
 }
 
 .nav-btn:hover {
@@ -177,7 +176,6 @@ body {
     transform: translateY(-1px) scale(1.05);
 }
 
-/* TOMBOL ADMIN */
 .admin-btn {
     background: linear-gradient(135deg, var(--gold), var(--accent));
     color: white;
@@ -229,7 +227,6 @@ body {
     display: inline-flex;
 }
 
-/* HERO */
 .hero {
     background: linear-gradient(135deg, var(--accent) 0%, #1e4a3a 100%);
     padding: 1.8rem 1rem;
@@ -271,13 +268,12 @@ body {
     display: inline-block;
 }
 
-/* PAGE CONTENT */
 .page-content {
-    display: none;
+    display: none !important;
 }
 
 .page-content.active {
-    display: block;
+    display: block !important;
 }
 
 .main-content {
@@ -286,7 +282,6 @@ body {
     padding: 1.5rem;
 }
 
-/* METRIK */
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -625,16 +620,17 @@ body.dark .bar-pos { background: #4a7a6a; }
             </div>
         </div>
         <div class="nav-links">
-            <a class="nav-btn active" data-page="beranda" href="#beranda">Beranda</a>
-            <a class="nav-btn" data-page="scraping" href="#scraping">Scraping</a>
-            <a class="nav-btn" data-page="model" href="#model">Model</a>
-            <a class="nav-btn" data-page="visual" href="#visual">Visual</a>
+            <!-- TANPA href AGAR TIDAK ADA PERPINDAHAN HALAMAN -->
+            <button class="nav-btn active" data-page="beranda">Beranda</button>
+            <button class="nav-btn" data-page="scraping">Scraping</button>
+            <button class="nav-btn" data-page="model">Model</button>
+            <button class="nav-btn" data-page="visual">Visual</button>
             
-            <button class="admin-btn" id="adminBtn" onclick="handleAdminClick()">
+            <button class="admin-btn" id="adminBtn">
                 <i class="bi bi-shield-lock-fill"></i> Admin
             </button>
             
-            <button class="logout-btn-nav" id="logoutBtnNav" onclick="handleLogout()">
+            <button class="logout-btn-nav" id="logoutBtnNav">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </button>
             
@@ -1088,10 +1084,13 @@ print(f"Sentimen: {hasil[0]}")
 
 <script>
 // ================================================================
-// 1. NAVIGASI MULTI PAGE
+// 1. NAVIGASI MULTI PAGE - TANPA HASH/ANCHOR
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    const navLinks = document.querySelectorAll('.nav-btn[data-page]');
+    // Ambil semua tombol navigasi
+    const navButtons = document.querySelectorAll('.nav-btn[data-page]');
+    
+    // Map page ID ke element
     const pages = {
         beranda: document.getElementById('page-beranda'),
         scraping: document.getElementById('page-scraping'),
@@ -1099,40 +1098,53 @@ document.addEventListener('DOMContentLoaded', function() {
         visual: document.getElementById('page-visual')
     };
 
+    // Fungsi untuk menampilkan page tertentu
     function showPage(pageId) {
-        Object.values(pages).forEach(p => p.classList.remove('active'));
+        // Sembunyikan semua page
+        Object.values(pages).forEach(p => {
+            if (p) p.classList.remove('active');
+        });
+        
+        // Tampilkan page yang dipilih
         if (pages[pageId]) {
             pages[pageId].classList.add('active');
         }
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.dataset.page === pageId) {
-                link.classList.add('active');
+        
+        // Update active class pada tombol navigasi
+        navButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.page === pageId) {
+                btn.classList.add('active');
             }
         });
-        if (history.pushState) {
-            history.pushState(null, '', '#' + pageId);
-        }
+        
+        // Simpan state di localStorage agar bisa diingat saat refresh
+        try {
+            localStorage.setItem('finsense_current_page', pageId);
+        } catch(e) {}
     }
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // Event listener untuk setiap tombol navigasi
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
-            showPage(this.dataset.page);
+            const pageId = this.dataset.page;
+            if (pageId) {
+                showPage(pageId);
+            }
         });
     });
 
-    function loadPageFromHash() {
-        const hash = window.location.hash.replace('#', '');
-        if (hash && pages[hash]) {
-            showPage(hash);
-        } else {
-            showPage('beranda');
+    // Load page terakhir yang disimpan atau default beranda
+    let defaultPage = 'beranda';
+    try {
+        const savedPage = localStorage.getItem('finsense_current_page');
+        if (savedPage && pages[savedPage]) {
+            defaultPage = savedPage;
         }
-    }
-
-    loadPageFromHash();
-    window.addEventListener('hashchange', loadPageFromHash);
+    } catch(e) {}
+    
+    showPage(defaultPage);
 });
 
 // ================================================================
@@ -1147,7 +1159,7 @@ if (localStorage.getItem('darkMode') === 'enabled') {
     icon.classList.add('bi-sun');
 }
 
-toggleBtn.addEventListener('click', () => {
+toggleBtn.addEventListener('click', function() {
     document.body.classList.toggle('dark');
     if (document.body.classList.contains('dark')) {
         localStorage.setItem('darkMode', 'enabled');
@@ -1180,7 +1192,7 @@ function updateAdminUI() {
     }
 }
 
-function handleAdminClick() {
+document.getElementById('adminBtn').addEventListener('click', function() {
     const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
     
     if (isLoggedIn) {
@@ -1203,9 +1215,9 @@ function handleAdminClick() {
     } else {
         showToast('Username atau password salah!');
     }
-}
+});
 
-function handleLogout() {
+document.getElementById('logoutBtnNav').addEventListener('click', function() {
     if (confirm('Apakah Anda yakin ingin logout?')) {
         sessionStorage.removeItem('admin_logged_in');
         sessionStorage.removeItem('admin_username');
@@ -1213,7 +1225,7 @@ function handleLogout() {
         updateAdminUI();
         showToast('Berhasil logout!');
     }
-}
+});
 
 function showToast(msg) {
     const toast = document.getElementById('toastNotif');
@@ -1234,6 +1246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🏦 FinSense SVM - Halaman Beranda (Static)');
 });
 
+// Cek login secara periodik
 setInterval(updateAdminUI, 5000);
 </script>
 </body>
